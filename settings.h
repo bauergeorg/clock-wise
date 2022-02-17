@@ -25,16 +25,16 @@
 #define PWMVALUE_MAXIMUM 254
 
 // Intensity VDR settings (value range is 8 bit)
-#define INTENSITY_GAIN 1
+#define INTENSITY_GAIN 3
 #define INTENSITY_OFFSET 0
-#define INTENSITY_MINIMUM 10
-#define INTENSITY_MAXIMUM 250
+#define INTENSITY_MINIMUM 0
+#define INTENSITY_MAXIMUM 254
 
 // Poti settings (value range is 8 bit)
 #define POTIVALUE_GAIN 1
 #define POTIVALUE_OFFSET 0
 #define POTIVALUE_MINIMUM 0
-#define POTIVALUE_MAXIMUM 255
+#define POTIVALUE_MAXIMUM 254
 
 // delay time of load signal (pulse width) in µs
 #define DELAYLOAD 1

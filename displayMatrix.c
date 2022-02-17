@@ -41,10 +41,13 @@ void displayMatrixInformation(uint8_t switchActiviation)
 			actualizeMatrixWithSystemTime();
 		}
 		// if no time signal is available
-		else if(!switchActiviation)
+		else
 		{
-			// actualize 'actualMatrix' Register with searching sequence
-			actualizeMatrixWithSearchingSequence();
+			if(!switchActiviation)
+			{
+				// actualize 'actualMatrix' Register with searching sequence
+				actualizeMatrixWithSearchingSequence();
+			}
 		}
 	}
 }

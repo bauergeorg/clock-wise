@@ -438,6 +438,10 @@ void decodeDcf77(void)
 void startDcf77Signal(void)
 {
 
+	// set default system status
+	// - xxxx.xx1xb searching dcf77 signal active
+	systemConfig.status |= 0x02;
+	
 	//! external interrupt for signal of dcf 77 receiver
 	// enabled external pin change interrupts PCINT23:16
 	PCICR |= 1 << PCIE2;
@@ -446,10 +450,6 @@ void startDcf77Signal(void)
 	// delete flag for interrupts PCINT23:16
 	PCIFR |= 1 << PCIF2;
 	
-	// set default system status
-	// - xxxx.xx1xb searching dcf77 signal active
-	systemConfig.status |= 0x02;
-
 	// enable when pc7 low
 	// switch PC7 low
 	PORTC &= ~(1 << PC7);
@@ -461,6 +461,11 @@ void startDcf77Signal(void)
 //! deactivate dcf77 signal
 void stopDcf77Signal(void)
 {
+	// set default system status
+	// - xxxx.xxx1b time information in system available
+	systemConfig.status |= 0x01;
+	// - xxxx.xx0xb searching dcf77 signal inactive
+	systemConfig.status &= ~0x02;
 
 	//! external interrupt for signal of dcf 77 receiver
 	// disabled external pin change interrupts PCINT23:16
@@ -470,11 +475,8 @@ void stopDcf77Signal(void)
 	// delete flag for interrupts PCINT23:16
 	PCIFR |= 1 << PCIF2;
 	
-	// set default system status
-	// - xxxx.xxx1b time information in system available
-	systemConfig.status |= 0x01;
-	// - xxxx.xx0xb searching dcf77 signal inactive
-	systemConfig.status &= ~0x02;
+	// test
+	switchOffStatusRed();
 	
 	// disable when pc7 high
 	// switch PC7 on

@@ -64,18 +64,25 @@ ISR(TIMER1_OVF_vect)
 	calculateTaskTiming();
 		
 	// calculate other time parameter
-	if (systemTime.second == 60)
+	if (systemTime.second >= 60)
 	{
 		systemTime.second = 0;
 		systemTime.minute++;
-		if (systemTime.minute == 60)
+		if (systemTime.minute >= 60)
 		{
 			systemTime.minute = 0;
 			systemTime.hour++;
-			if (systemTime.hour == 24)
+			if (systemTime.hour >= 24)
 			{
 				systemTime.hour = 0;
 				systemTime.day++;
+				
+				// weekday management
+				systemTime.weekday++;
+				if (systemTime.weekday >=8)
+				{
+					systemTime.weekday = 1;
+				}				
 				
 				// months with 31 days: january, march, may, july, august, october & december
 				if (systemTime.day == 32)
@@ -107,7 +114,7 @@ ISR(TIMER1_OVF_vect)
 					systemTime.day = 1;
 					systemTime.month++;
 					
-					if (systemTime.month == 13)
+					if (systemTime.month >= 13)
 					{
 						systemTime.month = 1;
 						systemTime.year++;

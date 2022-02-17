@@ -37,12 +37,12 @@ void initSystem(void)
 	systemConfig.displayBrightness = calcuateBrightness(systemConfig.lightIntensity, systemConfig.potentiometerValue);
 	// set default system display settings
 	// - xxxx.xxx0b straight pie
-	// - xxxx.000xb original without birthday and horses@6pm
-	// - x0xx.xxxxb automatic display brightness regulation is inactive
+	// - xxxx.001xb original with birthday and horses@6pm
+	// - x1xx.xxxxb automatic display brightness regulation is active
 	// - 1xxx.xxxxb only dot sequence when searching signal
-	systemConfig.displaySetting = 0x80; // see above
-	// set menu status to default
-	systemConfig.menuStatus = 0;
+	systemConfig.displaySetting = 0xC2; // see above
+	// set display status to dark
+	systemConfig.displayStatus = DISPLAY_STATE_DARK;
 	// system version 0.0.1
 	systemConfig.version = 1;
 	
@@ -67,8 +67,7 @@ uint8_t calcuateBrightness(uint8_t lightIntensity, uint8_t potentiometerValue)
 	// 1b automatic display brightness regulation is active
 	if(systemConfig.displaySetting & 0x40)
 	{
-		// mean value
-		brightness = (lightIntensity >> 1) + (potentiometerValue >> 1);
+		brightness = lightIntensity + potentiometerValue;
 	}
 	else
 	{
@@ -94,44 +93,52 @@ uint8_t calcuateBrightness(uint8_t lightIntensity, uint8_t potentiometerValue)
 
 uint8_t calculateIntensity(uint8_t intensity)
 {
+	// because of overflow handling
+	uint16_t intensity16;
+
 	// inverting value
 	intensity = ~intensity;
+	intensity16 = intensity;
 	
 	// gain and offset calculation (no overflow protection)
-	intensity *= INTENSITY_GAIN;
-	intensity += INTENSITY_OFFSET;
+	intensity16 *= INTENSITY_GAIN;
+	intensity16 += INTENSITY_OFFSET;
 	
 	// limitation
-	if (intensity >= INTENSITY_MAXIMUM)
+	if (intensity16 >= INTENSITY_MAXIMUM)
 	{
-		intensity = INTENSITY_MAXIMUM;
+		intensity16 = INTENSITY_MAXIMUM;
 	}
 	
-	if (intensity <= INTENSITY_MINIMUM)
+	if (intensity16 <= INTENSITY_MINIMUM)
 	{
-		intensity = INTENSITY_MINIMUM;
+		intensity16 = INTENSITY_MINIMUM;
 	}
-	return intensity;	
+	return (uint8_t)intensity16;	
 }
 
 uint8_t calculatePotiValue(uint8_t potiValue)
 {
+	// because of overflow handling
+	uint16_t potiValue16;
+
 	// inverting value
 	potiValue = ~potiValue;
+	potiValue16 = potiValue;
 	
 	// gain and offset calculation (no overflow protection)
-	potiValue *= POTIVALUE_GAIN;
-	potiValue += POTIVALUE_OFFSET;
+	potiValue16 *= POTIVALUE_GAIN;
+	potiValue16 += POTIVALUE_OFFSET;
 	
 	// limitation
-	if (potiValue >= POTIVALUE_MAXIMUM)
+	if (potiValue16 >= POTIVALUE_MAXIMUM)
 	{
-		potiValue = POTIVALUE_MAXIMUM;		
+		potiValue16 = POTIVALUE_MAXIMUM;		
 	}
 	
-	if (potiValue <= POTIVALUE_MINIMUM)
+	if (potiValue16 <= POTIVALUE_MINIMUM)
 	{
-		potiValue = POTIVALUE_MINIMUM;	
+		potiValue16 = POTIVALUE_MINIMUM;	
 	}
-	return potiValue;
+	return (uint8_t)potiValue16;
 }

@@ -88,17 +88,17 @@ ISR(PCINT0_vect)
 	switches = (PINA & 0x3C) >> 2;
 
 	// any thing else is pressed in the menu mode
-	if(systemConfig.menuStatus >= 1)
+	if(systemConfig.displayStatus >= DISPLAY_STATE_MENU_WAIT)
 	{
 		// call menu management function
 		menuMgnt(switches);
 	}
 
 	// cancel and ok is pressed at the same time in standard mode
-	if((switches & 0x08) && (switches & 0x01) && (systemConfig.menuStatus == 0))
+	if((switches & 0x08) && (switches & 0x01) && (systemConfig.displayStatus <= DISPLAY_STATE_MENU_WAIT))
 	{
-		// set new menu status: show version
-		systemConfig.menuStatus = 1;
+		// set new display status: show version
+		systemConfig.displayStatus = DISPLAY_STATE_MENU_WAIT;
 	}
 
 	// delete flag for interrupts PCINT0:7

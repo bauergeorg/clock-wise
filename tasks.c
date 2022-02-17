@@ -52,12 +52,7 @@ void taskTenMinute(void)
 //! Task 5 minute
 void taskFiveMinute(void)
 {
-	// read light intensity value of adc
-	systemConfig.lightIntensity = calculateIntensity(adcRead(0));
-	// real potentiometer value of adc
-	systemConfig.potentiometerValue = calculatePotiValue(adcRead(1));
-	// calculate display brightness value
-	systemConfig.displayBrightness = calcuateBrightness(systemConfig.lightIntensity, systemConfig.potentiometerValue);
+
 }
 
 //! Task minute
@@ -71,13 +66,11 @@ void taskSecond(void)
 {
 	// toggle status led
 	toggleStatusGreen();
-	
-	// display information on matrix, called by second interrupt (time management)
-	displayMatrixInformation(0);
 }
 
 //! Task half second
 void taskHalfSecond(void)
 {
-	
+	// display information on matrix, called by second interrupt (time management)
+	displayMatrixInformation(0);
 }

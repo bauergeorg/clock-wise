@@ -83,7 +83,7 @@ int main(void)
 
 	// read light intensity value of adc
 	systemConfig.lightIntensity = calculateIntensity(adcRead(0));
-	// real potentiometer value of adc
+	// read potentiometer value of adc
 	systemConfig.potentiometerValue = calculatePotiValue(adcRead(1));
 	// calculate display brightness value
 	systemConfig.displayBrightness = calcuateBrightness(systemConfig.lightIntensity, systemConfig.potentiometerValue);
@@ -91,7 +91,7 @@ int main(void)
 	// enable global interrupt
 	sei();
 	
-	// test
+	// switsch off test leds
 	switchOffStatusYellow();
 	switchOffStatusRed();
 
@@ -104,6 +104,8 @@ int main(void)
 		// set default system status
 		// - xxxx.xx1xb searching dcf77 signal active
 		systemConfig.status |= 0x02;
+		// set display status to searching sequence
+		systemConfig.displayStatus = DISPLAY_STATE_SEARCH;
 		// - xxxx.xxx0b no time value available
 		// - xxxx.x0xxb rtc time is not available
 		systemConfig.status &= ~0x05;
@@ -123,5 +125,13 @@ int main(void)
 	{
 		// when do nothing
 		checkForTask();
+		
+		// and
+			// read light intensity value of adc
+			systemConfig.lightIntensity = calculateIntensity(adcRead(0));
+			// read potentiometer value of adc
+			systemConfig.potentiometerValue = calculatePotiValue(adcRead(1));
+			// calculate display brightness value
+			systemConfig.displayBrightness = calcuateBrightness(systemConfig.lightIntensity, systemConfig.potentiometerValue);
     }	
 }
