@@ -1,6 +1,6 @@
 /*******************************************************************************
 *
-*	Author:			Georg Bauer (geo_bauer@gmx.net)
+*	Author:			Georg Bauer
 *	Date:			04.01.2016
 *
 *	Project-Title:	ClockWise
