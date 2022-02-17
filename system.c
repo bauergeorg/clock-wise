@@ -43,18 +43,18 @@ void initSystem(void)
 	systemConfig.displaySetting = 0xC2; // see above
 	// set display status to dark
 	systemConfig.displayStatus = DISPLAY_STATE_DARK;
-	// system version 0.0.2
-	systemConfig.version = 2;
+	// system version 0.0.3
+	systemConfig.version = 3;
 	
 	// set init time values
 	// (wedding day from dad and mom) 
-	systemTime.year		= 16;
+	systemTime.year		= 18;
 	systemTime.month	= 12;
-	systemTime.day		= 28;
-	systemTime.hour		= 18;
-	systemTime.minute	= 00;
+	systemTime.day		= 24;
+	systemTime.hour		= 9;
+	systemTime.minute	= 0;
 	systemTime.second	= 0;
-	systemTime.weekday	= 3;
+	systemTime.weekday	= 1; // monday
 }
 
 uint8_t calcuateBrightness(uint8_t lightIntensity, uint8_t potentiometerValue)

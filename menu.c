@@ -1003,7 +1003,7 @@ void menuMgnt(uint8_t switches)
 					if(okSwitch)
 					{
 						// set system display settings
-						// - 0xxx.xxxxb set's the display sequence while time searching mode - suqare
+						// - 0xxx.xxxxb set's the display sequence while time searching mode - square
 						systemConfig.displaySetting &= ~0x80; // see above
 						// set new display status: display settings searching sequence
 						systemConfig.displayStatus = DISPLAY_STATE_MENU_SEARCH_MODE;

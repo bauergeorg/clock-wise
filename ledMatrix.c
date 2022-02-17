@@ -49,6 +49,7 @@
 #include "dcf77.h"
 #include "gpios.h"
 #include "settings.h"
+#include "displayMatrix.h"
 #include <util/delay.h>
 
 //! Own global variables
@@ -663,12 +664,12 @@ void actualizeMatrixWithSystemTime()
 			break;
 	}
 		
-	//! special cases
+	//! special cases: feed horses or birthday
 	if(systemConfig.displaySetting & 0x02)
 	{
 		// time to feed horses
-		if (((actualHour ==  18) && (systemTime.minute >= 0) && (systemTime.minute < 8)) ||
-		((actualHour ==  8) && (systemTime.minute >= 0) && (systemTime.minute < 8)))
+		if (((systemTime.hour ==  18) && (systemTime.minute >= 0) && (systemTime.minute < 8)) ||
+		((systemTime.hour ==  8) && (systemTime.minute >= 0) && (systemTime.minute < 8)))
 		{
 			// actualize display status
 			systemConfig.displayStatus = DISPLAY_STATE_SPECIAL_HORSES;
@@ -705,11 +706,11 @@ void actualizeMatrixWithSystemTime()
 		(systemTime.day == 7 && systemTime.month == 8) ||
 		(systemTime.day == 22 && systemTime.month == 9) ||
 		(systemTime.day == 8 && systemTime.month == 12)) &&
-		(((actualHour ==  0) && (systemTime.minute >= 0) && (systemTime.minute < 8)) ||
-		((actualHour ==  6) && (systemTime.minute >= 0) && (systemTime.minute < 8)) ||
-		((actualHour ==  7) && (systemTime.minute >= 0) && (systemTime.minute < 8)) ||
-		((actualHour ==  11) && (systemTime.minute >= 0) && (systemTime.minute < 8)) ||
-		((actualHour ==  23) && (systemTime.minute >= 53) && (systemTime.minute < 59))))
+		(((systemTime.hour ==  0) && (systemTime.minute >= 0) && (systemTime.minute < 8)) ||
+		((systemTime.hour ==  6) && (systemTime.minute >= 0) && (systemTime.minute < 8)) ||
+		((systemTime.hour ==  7) && (systemTime.minute >= 0) && (systemTime.minute < 8)) ||
+		((systemTime.hour ==  11) && (systemTime.minute >= 0) && (systemTime.minute < 8)) ||
+		((systemTime.hour ==  23) && (systemTime.minute >= 53) && (systemTime.minute < 59))))
 		{
 			// actualize display status
 			systemConfig.displayStatus = DISPLAY_STATE_SPECIAL_BIRTHDAY;
@@ -739,6 +740,37 @@ void actualizeMatrixWithSystemTime()
 			actualMatrix[11].high	= 0b00000000;
 			actualMatrix[11].low	= 0b00000000;
 		}
+	}
+	
+	//! special cases: get automatic time, when automatic mode active: Monday 02:12:12
+	// system status
+	// - xxx0.xxxxb automatic time mode is active
+	if(!(systemConfig.status & 0x10) &&
+		(systemTime.hour == 2) && 
+		(systemTime.minute == 12) && 
+		(systemTime.second == 12) &&
+		(systemTime.weekday == 1) // monday = 1
+	  )
+	{
+		// start receiving
+		startDcf77Signal();					
+		// set system status
+		// - xxxx.xxx0b no time information in system available - the searching sequence is displayed
+		// - xxx0.xxxxb automatic time mode is active
+		systemConfig.status &= ~0x11;
+		// - xxxx.xx1xb searching for dcf77-signal is active
+		systemConfig.status |= 0x02;				
+		// set new display status: show searching mode
+		systemConfig.displayStatus = DISPLAY_STATE_SEARCH;	
+		
+		// set default system status
+		// - xxxx.0xxxb setting menu is inactive
+		systemConfig.status &= ~0x08;
+		// set new display status
+		systemConfig.displayStatus = DISPLAY_STATE_DARK;
+	
+		// actualize matrix information
+		displayMatrixInformation(0);
 	}
 }
 
@@ -1067,7 +1099,7 @@ void actualizeMatrixInMenuMode(void)
 		// show version
 		case DISPLAY_STATE_MENU_VERSION:
 		{
-			// display a VER lbr 002			
+			// display a VER lbr 003			
 			actualMatrix[0].high	= 0xAE;
 			actualMatrix[0].low		= 0xC0;
 			actualMatrix[1].high	= 0xA8;
@@ -1087,7 +1119,7 @@ void actualizeMatrixInMenuMode(void)
 			actualMatrix[8].high	= 0xAA;
 			actualMatrix[8].low		= 0xE0;
 			actualMatrix[9].high	= 0xAA;
-			actualMatrix[9].low		= 0x80;
+			actualMatrix[9].low		= 0x20;
 			actualMatrix[10].high	= 0xEE;
 			actualMatrix[10].low	= 0xE0;
 			actualMatrix[11].high	= 0x00;
