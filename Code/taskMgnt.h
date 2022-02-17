@@ -1,20 +1,20 @@
 /*******************************************************************************
 *
 *	Author:			Georg Bauer (geo_bauer@gmx.net)
-*	Date:			10.04.2014
+*	Date:			16.05.2014
 *
 *	Project-Title:	ClockWise
-*	Description:	UART Communication
+*	Description:	Summary of tasks
 *
-*	File-Title:		USART File - Header File
+*	File-Title:		Tasks - Header File
 *
 *******************************************************************************
 */
 
 //! Libraries
-#include <avr/io.h>
 #include <stdint.h>
 
 //! Functional prototypes
-void initUsart(void);
-void usartReceiveTransmit(uint8_t data);
+void initTasks(void);
+void calculateTaskTiming(void);
+void checkForTask(void);

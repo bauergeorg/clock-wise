@@ -1,20 +1,19 @@
 /*******************************************************************************
 *
 *	Author:			Georg Bauer (geo_bauer@gmx.net)
-*	Date:			10.04.2014
+*	Date:			04.01.2016
 *
 *	Project-Title:	ClockWise
-*	Description:	UART Communication
+*	Description:	***
 *
-*	File-Title:		USART File - Header File
+*	File-Title:		Display Matrix Information - Header File
 *
 *******************************************************************************
 */
 
-//! Libraries
+//! libraries
 #include <avr/io.h>
 #include <stdint.h>
 
 //! Functional prototypes
-void initUsart(void);
-void usartReceiveTransmit(uint8_t data);
+void displayMatrixInformation(uint8_t switchActiviation);

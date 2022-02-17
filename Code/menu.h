@@ -1,20 +1,20 @@
 /*******************************************************************************
 *
 *	Author:			Georg Bauer (geo_bauer@gmx.net)
-*	Date:			10.04.2014
+*	Date:			04.01.2016
 *
 *	Project-Title:	ClockWise
-*	Description:	UART Communication
+*	Description:	µC controlled clock with DCF77, RTC and a led-matrix
 *
-*	File-Title:		USART File - Header File
+*	File-Title:		Menu Management - Header File
 *
 *******************************************************************************
 */
 
-//! Libraries
+//! libraries
 #include <avr/io.h>
 #include <stdint.h>
 
 //! Functional prototypes
-void initUsart(void);
-void usartReceiveTransmit(uint8_t data);
+void menuMgnt(uint8_t switches);
+void menuCancel(void);

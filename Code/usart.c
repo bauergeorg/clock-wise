@@ -20,7 +20,7 @@
 *
 *******************************************************************************
 *
-* UART1 in SPI Mode works @400kHz
+* UART1 in SPI Mode works @800kHz
 *
 * Settings to decode with Saleae Logic Analyzer:
 * 
@@ -41,19 +41,20 @@ void initUsart(void)
 	UCSR1C = (1 << UMSEL11) | (1 << UMSEL10) | (0 << UCSZ10) | (0 << UCPOL1);
 	// Enable receiver and transmitter
 	UCSR1B = (1 << RXEN1) | (1 << TXEN1);
-	// set baud rate = fosc / ( 2 * (UBRR + 1))  = 1MHz  (UBBR1 = 7)
+	// set baud rate = fosc / ( 2 * (UBRR + 1))  = 800kHz  (UBBR1 = 9)
 	// IMPORTANT: The Baud Rate must be set after the transmitter is enabled
-	UBRR1 = 19; // 400kHZ
+	UBRR1 = 9; // 800kHZ
 }
 
-uint8_t usartReceiveTransmit(uint8_t data)
+void usartReceiveTransmit(uint8_t data)
 {
 	// Wait for empty transmit buffer 
 	while ( !(UCSR1A & (1 << UDRE1)) );
 	// Put data into buffer, sends the data
 	UDR1 = data;
-	// Wait for data to be received
+/*	// Wait for data to be received
 	while ( !(UCSR1A & (1 << RXC1)) );
 	// Get and return received data from buffer
 	return UDR1;
+	*/
 }

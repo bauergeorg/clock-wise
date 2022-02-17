@@ -16,16 +16,19 @@
 #include "settings.h"
 
 //! Own global variables
-struct systemParameter systemConfig;
-struct time systemTime;
+volatile struct systemParameter systemConfig;
+volatile struct time systemTime;
 
 //! Write Initial values
 void initSystem(void)
 {
 	// set default system status
-	// - x0b no time value available
-	// - 1xb searching dcf77 signal
-	systemConfig.status =  0x02;
+	// - xxxx.xxx0b no time value available
+	// - xxxx.xx0xb searching dcf77 signal inactive
+	// - xxxx.x0xxb rtc time is not available
+	// - xxxx.0xxxb setting menu is inactive
+	// - xxx1.xxxxb automatic time mode is active
+	systemConfig.status = 0x10;
 	// default light intensity
 	systemConfig.lightIntensity = 10;
 	// set value of potentiometer 		
@@ -33,21 +36,25 @@ void initSystem(void)
 	// default display brightness
 	systemConfig.displayBrightness = calcuateBrightness(systemConfig.lightIntensity, systemConfig.potentiometerValue);
 	// set default system display settings
-	// - xxxx0001b birthday and horses
-	// - xx01xxxxb active dot led's for seconds (no fade)
-	// - xx00xxxxb active dot led's for minutes (no fade)
-	// - x1xxxxxxb automatic display brightness is active
-	systemConfig.displaySetting = 0x51; //0x11 without automatic brightness regulation
-
+	// - xxxx.xxx0b straight pie
+	// - xxxx.001xb original with birthday and horses@6pm
+	// - x1xx.xxxxb automatic display brightness regulation is active
+	// - 1xxx.xxxxb no sequence when searching signal
+	systemConfig.displaySetting = 0xC2; // see above
+	// set display status to dark
+	systemConfig.displayStatus = DISPLAY_STATE_DARK;
+	// system version 0.0.3
+	systemConfig.version = 3;
+	
 	// set init time values
 	// (wedding day from dad and mom) 
-	systemTime.year = 14;
-	systemTime.month = 5;
-	systemTime.day = 1;
-	systemTime.hour = 0;
-	systemTime.minute = 0;
-	systemTime.second = 0;
-	systemTime.weekday = 0;
+	systemTime.year		= 18;
+	systemTime.month	= 12;
+	systemTime.day		= 24;
+	systemTime.hour		= 9;
+	systemTime.minute	= 0;
+	systemTime.second	= 0;
+	systemTime.weekday	= 1; // monday
 }
 
 uint8_t calcuateBrightness(uint8_t lightIntensity, uint8_t potentiometerValue)
@@ -58,10 +65,9 @@ uint8_t calcuateBrightness(uint8_t lightIntensity, uint8_t potentiometerValue)
 	// (bit 6):	shows automatic display brightness variant
 	// 0b automatic display brightness regulation is inactive
 	// 1b automatic display brightness regulation is active
-	if(systemConfig.displaySetting & 0b01000000)
+	if(systemConfig.displaySetting & 0x40)
 	{
-		// mean value
-		brightness = (lightIntensity >> 1) + (potentiometerValue >> 1);
+		brightness = lightIntensity + potentiometerValue;
 	}
 	else
 	{
@@ -87,44 +93,52 @@ uint8_t calcuateBrightness(uint8_t lightIntensity, uint8_t potentiometerValue)
 
 uint8_t calculateIntensity(uint8_t intensity)
 {
+	// because of overflow handling
+	uint16_t intensity16;
+
 	// inverting value
 	intensity = ~intensity;
+	intensity16 = intensity;
 	
 	// gain and offset calculation (no overflow protection)
-	intensity *= INTENSITY_GAIN;
-	intensity += INTENSITY_OFFSET;
+	intensity16 *= INTENSITY_GAIN;
+	intensity16 += INTENSITY_OFFSET;
 	
 	// limitation
-	if (intensity >= INTENSITY_MAXIMUM)
+	if (intensity16 >= INTENSITY_MAXIMUM)
 	{
-		intensity = INTENSITY_MAXIMUM;
+		intensity16 = INTENSITY_MAXIMUM;
 	}
 	
-	if (intensity <= INTENSITY_MINIMUM)
+	if (intensity16 <= INTENSITY_MINIMUM)
 	{
-		intensity = INTENSITY_MINIMUM;
+		intensity16 = INTENSITY_MINIMUM;
 	}
-	return intensity;	
+	return (uint8_t)intensity16;	
 }
 
 uint8_t calculatePotiValue(uint8_t potiValue)
 {
+	// because of overflow handling
+	uint16_t potiValue16;
+
 	// inverting value
 	potiValue = ~potiValue;
+	potiValue16 = potiValue;
 	
 	// gain and offset calculation (no overflow protection)
-	potiValue *= POTIVALUE_GAIN;
-	potiValue += POTIVALUE_OFFSET;
+	potiValue16 *= POTIVALUE_GAIN;
+	potiValue16 += POTIVALUE_OFFSET;
 	
 	// limitation
-	if (potiValue >= POTIVALUE_MAXIMUM)
+	if (potiValue16 >= POTIVALUE_MAXIMUM)
 	{
-		potiValue = POTIVALUE_MAXIMUM;		
+		potiValue16 = POTIVALUE_MAXIMUM;		
 	}
 	
-	if (potiValue <= POTIVALUE_MINIMUM)
+	if (potiValue16 <= POTIVALUE_MINIMUM)
 	{
-		potiValue = POTIVALUE_MINIMUM;	
+		potiValue16 = POTIVALUE_MINIMUM;	
 	}
-	return potiValue;
+	return (uint8_t)potiValue16;
 }
