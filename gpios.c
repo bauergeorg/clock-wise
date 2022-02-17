@@ -35,6 +35,7 @@
 //! Libraries
 #include "gpios.h"
 #include "system.h"
+#include "menu.h"
 
 /*
 // Own global variables
@@ -79,30 +80,27 @@ void initGpios(void)
 // is called when a switch is pressed in and pressed out
 ISR(PCINT0_vect)
 {
+	// actual values for switches
 	uint8_t switches;
 
 	// get value of switch 1, 2, 3 and 4 - masking with 0011.1100b and shift to right
 	// alternative text: (PINA & ((1<<PINA2) | (1<<PINA3) | (1<<PINA4) | (1<<PINA5)) >> 2; 
 	switches = (PINA & 0x3C) >> 2;
-	if((switches & 0x08) && ((switches & 0x01)))
+
+	// any thing else is pressed in the menu mode
+	if(systemConfig.menuStatus >= 1)
 	{
-		// set default system status
-		// - xxxx.1xxxb setting menu is active
-		systemConfig.status |= 0x04;
-		
-		// test
-		switchOnStatusRed();
+		// call menu management function
+		menuMgnt(switches);
 	}
-	if(switches == 0x01)
+
+	// cancel and ok is pressed at the same time in standard mode
+	if((switches & 0x08) && (switches & 0x01) && (systemConfig.menuStatus == 0))
 	{
-		// set default system status
-		// - xxxx.0xxxb setting menu is active
-		systemConfig.status &= ~0x04;
-		
-		// test
-		switchOffStatusRed();
+		// set new menu status: show version
+		systemConfig.menuStatus = 1;
 	}
-	
+
 	// delete flag for interrupts PCINT0:7
 	PCIFR |= 1 << PCIF0;
 }

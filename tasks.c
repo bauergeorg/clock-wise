@@ -17,6 +17,7 @@
 #include "system.h"
 #include "gpios.h"
 #include "adc.h"
+#include "displayMatrix.h"
 #include "ledMatrix.h"
 
 //! Extern global variables
@@ -71,28 +72,8 @@ void taskSecond(void)
 	// toggle status led
 	toggleStatusGreen();
 	
-	// if menu mode
-	if(systemConfig.status & 0x04)
-	{
-		// display menu stat
-		actualizeMatrixInMenuMode();
-	}
-	else
-	{
-		// if time signal is available
-		// display time and dot action
-		if(systemConfig.status & 0x01)
-		{
-			// actualize 'actualMatrix' Register with system time
-			actualizeMatrixWithSystemTime();
-		}
-		// if no time signal is available
-		else
-		{
-			// actualize 'actualMatrix' Register with searching sequence
-			actualizeMatrixWithSearchingSequence();
-		}
-	}
+	// display information on matrix, called by second interrupt (time management)
+	displayMatrixInformation(0);
 }
 
 //! Task half second

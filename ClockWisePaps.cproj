@@ -138,6 +138,12 @@
     <Compile Include="dcf77.h">
       <SubType>compile</SubType>
     </Compile>
+    <Compile Include="displayMatrix.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="displayMatrix.h">
+      <SubType>compile</SubType>
+    </Compile>
     <Compile Include="gpios.c">
       <SubType>compile</SubType>
     </Compile>
@@ -151,6 +157,12 @@
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="main.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="menu.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="menu.h">
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="rtc.c">

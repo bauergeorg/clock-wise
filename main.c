@@ -54,7 +54,7 @@
 //#include "usart.h"
 #include "adc.h"
 
-#include <util/delay.h>
+//#include <util/delay.h>
 
 //! Extern global variables
 extern volatile struct systemParameter systemConfig;
@@ -62,7 +62,7 @@ extern volatile struct time systemTime;
 extern volatile uint8_t dcfArray[60];
 
 // definition of the pause
-const double DELAYUART = 1;  // 1µs
+const double DELAYUART = 1;  // 1µs	
 	
 //! Main routine
 // just do nothing is the best way ;)
@@ -115,7 +115,7 @@ int main(void)
 		// - xxxx.x1xxb rtc time is available
 		systemConfig.status |= 0x05;
 		// - xxxx.xx0xb searching dcf77 signal inactive
-		systemConfig.status &= ~0x2;
+		systemConfig.status &= ~0x02;
 	}
 
 	// endless loop

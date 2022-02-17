@@ -1038,31 +1038,277 @@ void actualizeMatrixWithSearchingSequence()
 }
 
 // actualize 'actualMatrix' Register with in menu mode
-void actualizeMatrixInMenuMode()
+void actualizeMatrixInMenuMode(void)
 {
-		// binary date time
-		actualMatrix[0].high	= systemConfig.version;
-		actualMatrix[0].low		= 0;
-		actualMatrix[1].high	= 0;
-		actualMatrix[1].low		= 0;
-		actualMatrix[2].high	= 0;
-		actualMatrix[2].low		= 0;
-		actualMatrix[3].high	= 0;
-		actualMatrix[3].low		= 0;
-		actualMatrix[4].high	= 0;
-		actualMatrix[4].low		= 0;	
-		actualMatrix[5].high	= systemTime.hour;
-		actualMatrix[5].low		= 0;
-		actualMatrix[6].high	= systemTime.minute;
-		actualMatrix[6].low		= 0;
-		actualMatrix[7].high	= systemTime.second;
-		actualMatrix[7].low		= 0;
-		actualMatrix[8].high	= systemTime.year;
-		actualMatrix[8].low		= 0;
-		actualMatrix[9].high	= systemTime.month;
-		actualMatrix[9].low		= 0;
-		actualMatrix[10].high	= systemTime.day;
-		actualMatrix[10].low	= 0;
-		actualMatrix[11].high	= systemTime.weekday;
-		actualMatrix[11].low	= 0;
+	switch(systemConfig.menuStatus)
+	{
+		// show version
+		case 10:
+		{
+			// display a VER lbr 001			
+			actualMatrix[0].high	= 0xAE;
+			actualMatrix[0].low		= 0xC0;
+			actualMatrix[1].high	= 0xA8;
+			actualMatrix[1].low		= 0xA0;
+			actualMatrix[2].high	= 0xAC;
+			actualMatrix[2].low		= 0xC0;
+			actualMatrix[3].high	= 0xA8;
+			actualMatrix[3].low		= 0xA0;
+			actualMatrix[4].high	= 0x4E;
+			actualMatrix[4].low		= 0xA0;
+			actualMatrix[5].high	= 0;
+			actualMatrix[5].low		= 0;
+			actualMatrix[6].high	= 0xEE;
+			actualMatrix[6].low		= 0x20;
+			actualMatrix[7].high	= 0xAA;
+			actualMatrix[7].low		= 0x60;
+			actualMatrix[8].high	= 0xAA;
+			actualMatrix[8].low		= 0xA0;
+			actualMatrix[9].high	= 0xAA;
+			actualMatrix[9].low		= 0x20;
+			actualMatrix[10].high	= 0xEE;
+			actualMatrix[10].low	= 0x20;
+			actualMatrix[11].high	= 0x11;
+			actualMatrix[11].low	= 0x00;
+			break;
+		}
+		
+		// time mode
+		case 100:
+		{
+			/*
+			// binary date time
+			actualMatrix[0].high	= systemConfig.version;
+			actualMatrix[0].low		= 0;
+			actualMatrix[1].high	= 0;
+			actualMatrix[1].low		= 0;
+			actualMatrix[2].high	= 0;
+			actualMatrix[2].low		= 0;
+			actualMatrix[3].high	= 0;
+			actualMatrix[3].low		= 0;
+			actualMatrix[4].high	= 0;
+			actualMatrix[4].low		= 0;
+			actualMatrix[5].high	= systemTime.hour;
+			actualMatrix[5].low		= 0;
+			actualMatrix[6].high	= systemTime.minute;
+			actualMatrix[6].low		= 0;
+			actualMatrix[7].high	= systemTime.second;
+			actualMatrix[7].low		= 0;
+			actualMatrix[8].high	= systemTime.year;
+			actualMatrix[8].low		= 0;
+			actualMatrix[9].high	= systemTime.month;
+			actualMatrix[9].low		= 0;
+			actualMatrix[10].high	= systemTime.day;
+			actualMatrix[10].low	= 0;
+			actualMatrix[11].high	= systemTime.weekday;
+			actualMatrix[11].low	= 0;
+			*/
+			// display a TIME
+			actualMatrix[0].high	= 0xEA;
+			actualMatrix[0].low		= 0xB0;
+			actualMatrix[1].high	= 0x4B;
+			actualMatrix[1].low		= 0xA0;
+			actualMatrix[2].high	= 0x4A;
+			actualMatrix[2].low		= 0xB0;
+			actualMatrix[3].high	= 0x4A;
+			actualMatrix[3].low		= 0xA0;
+			actualMatrix[4].high	= 0x4A;
+			actualMatrix[4].low		= 0xB0;
+			actualMatrix[5].high	= 0;
+			actualMatrix[5].low		= 0;
+			actualMatrix[6].high	= 0x00;
+			actualMatrix[6].low		= 0x00;
+			actualMatrix[7].high	= 0x00;
+			actualMatrix[7].low		= 0x00;
+			actualMatrix[8].high	= 0x00;
+			actualMatrix[8].low		= 0x00;
+			actualMatrix[9].high	= 0x00;
+			actualMatrix[9].low		= 0x00;
+			actualMatrix[10].high	= 0x00;
+			actualMatrix[10].low	= 0x00;
+			actualMatrix[11].high	= 0x00;
+			actualMatrix[11].low	= 0x00;
+			break;
+					
+		}
+		
+		// automatic mode
+		case 110:
+		{
+			// display a TIME lbr AUT.
+			actualMatrix[0].high	= 0xEA;
+			actualMatrix[0].low		= 0xB0;
+			actualMatrix[1].high	= 0x4B;
+			actualMatrix[1].low		= 0xA0;
+			actualMatrix[2].high	= 0x4A;
+			actualMatrix[2].low		= 0xB0;
+			actualMatrix[3].high	= 0x4A;
+			actualMatrix[3].low		= 0xA0;
+			actualMatrix[4].high	= 0x4A;
+			actualMatrix[4].low		= 0xB0;
+			actualMatrix[5].high	= 0;
+			actualMatrix[5].low		= 0;
+			actualMatrix[6].high	= 0x4A;
+			actualMatrix[6].low		= 0xE0;
+			actualMatrix[7].high	= 0xAA;
+			actualMatrix[7].low		= 0x40;
+			actualMatrix[8].high	= 0xEA;
+			actualMatrix[8].low		= 0x40;
+			actualMatrix[9].high	= 0xAA;
+			actualMatrix[9].low		= 0x40;
+			actualMatrix[10].high	= 0xAE;
+			actualMatrix[10].low	= 0x50;
+			actualMatrix[11].high	= 0x00;
+			actualMatrix[11].low	= 0x00;
+			break;		
+		}
+			
+		// manual mode
+		case 120:
+		{
+			// display a TIME lbr MAN
+			actualMatrix[0].high	= 0xEA;
+			actualMatrix[0].low		= 0xB0;
+			actualMatrix[1].high	= 0x4B;
+			actualMatrix[1].low		= 0xA0;
+			actualMatrix[2].high	= 0x4A;
+			actualMatrix[2].low		= 0xB0;
+			actualMatrix[3].high	= 0x4A;
+			actualMatrix[3].low		= 0xA0;
+			actualMatrix[4].high	= 0x4A;
+			actualMatrix[4].low		= 0xB0;
+			actualMatrix[5].high	= 0;
+			actualMatrix[5].low		= 0;
+			actualMatrix[6].high	= 0xA4;
+			actualMatrix[6].low		= 0x90;
+			actualMatrix[7].high	= 0xEA;
+			actualMatrix[7].low		= 0xC0;
+			actualMatrix[8].high	= 0xAE;
+			actualMatrix[8].low		= 0x90;
+			actualMatrix[9].high	= 0xAA;
+			actualMatrix[9].low		= 0xB0;
+			actualMatrix[10].high	= 0xAA;
+			actualMatrix[10].low	= 0x90;
+			actualMatrix[11].high	= 0x00;
+			actualMatrix[11].low	= 0x00;
+			break;
+		}
+				
+		// set time manual
+		case 121:
+		{
+			// display SET with ok and cancel
+			actualMatrix[0].high	= 0xEE;
+			actualMatrix[0].low		= 0xE0;
+			actualMatrix[1].high	= 0x88;
+			actualMatrix[1].low		= 0x40;
+			actualMatrix[2].high	= 0xEC;
+			actualMatrix[2].low		= 0x40;
+			actualMatrix[3].high	= 0x28;
+			actualMatrix[3].low		= 0x40;
+			actualMatrix[4].high	= 0xEE;
+			actualMatrix[4].low		= 0x40;
+			actualMatrix[5].high	= 0;
+			actualMatrix[5].low		= 0;
+			actualMatrix[6].high	= 0;
+			actualMatrix[6].low		= 0;
+			actualMatrix[7].high	= 0;
+			actualMatrix[7].low		= 0;
+			actualMatrix[8].high	= 0;
+			actualMatrix[8].low		= 0;
+			actualMatrix[9].high	= 0x50;
+			actualMatrix[9].low		= 0x20;
+			actualMatrix[10].high	= 0x21;
+			actualMatrix[10].low	= 0x40;
+			actualMatrix[11].high	= 0x50;
+			actualMatrix[11].low	= 0x80;
+			break;
+		}
+		
+		// set hour manual
+		case 122:
+		{
+			// display a time to set with ok and cancel	
+		/*	actualMatrix[0].high	= systemTime.hour;
+			actualMatrix[0].low		= 0;
+			actualMatrix[1].high	= systemTime.minute;
+			actualMatrix[1].low		= 0;
+			actualMatrix[2].high	= systemTime.second;
+			actualMatrix[2].low		= 0;
+			actualMatrix[3].high	= 0;
+			actualMatrix[3].low		= 0;
+			actualMatrix[4].high	= systemTime.year;
+			actualMatrix[4].low		= 0;
+			actualMatrix[5].high	= systemTime.month;
+			actualMatrix[5].low		= 0;
+			actualMatrix[6].high	= systemTime.day;
+			actualMatrix[6].low		= 0;
+			actualMatrix[7].high	= systemTime.weekday;
+			actualMatrix[7].low		= 0;*/
+
+			actualMatrix[0].high	= (systemTime.hour >> 4) & 0x0F;
+			actualMatrix[0].low		= (systemTime.hour << 4) & 0xF0;
+			actualMatrix[1].high	= (systemTime.minute >> 4) & 0x0F;
+			actualMatrix[1].low		= (systemTime.minute << 4) & 0xF0;
+			actualMatrix[2].high	= (systemTime.second >> 4) & 0x0F;
+			actualMatrix[2].low		= (systemTime.second << 4) & 0xF0;
+			actualMatrix[3].high	= 0;
+			actualMatrix[3].low		= 0;
+			actualMatrix[4].high	= (systemTime.year >> 4) & 0x0F;
+			actualMatrix[4].low		= (systemTime.year << 4) & 0xF0;
+			actualMatrix[5].high	= (systemTime.month >> 4) & 0x0F;
+			actualMatrix[5].low		= (systemTime.month << 4) & 0xF0;
+			actualMatrix[6].high	= (systemTime.day >> 4) & 0x0F;
+			actualMatrix[6].low		= (systemTime.day << 4) & 0xF0;
+			actualMatrix[7].high	= (systemTime.weekday >> 4) & 0x0F;
+			actualMatrix[7].low		= (systemTime.weekday << 4) & 0xF0;
+			actualMatrix[8].high	= 0;
+			actualMatrix[8].low		= 0;
+			actualMatrix[9].high	= 0x50;
+			actualMatrix[9].low		= 0x20;
+			actualMatrix[10].high	= 0x21;
+			actualMatrix[10].low	= 0x40;
+			actualMatrix[11].high	= 0x50;
+			actualMatrix[11].low	= 0x80;
+			break;
+		}
+		
+		// display settings
+		case 200:
+		{
+			// binary date time
+			actualMatrix[0].high	= systemConfig.version;
+			actualMatrix[0].low		= 0;
+			actualMatrix[1].high	= 0;
+			actualMatrix[1].low		= 0;
+			actualMatrix[2].high	= 0;
+			actualMatrix[2].low		= 0;
+			actualMatrix[3].high	= 0;
+			actualMatrix[3].low		= 0;
+			actualMatrix[4].high	= 0;
+			actualMatrix[4].low		= 0;
+			actualMatrix[5].high	= 0;
+			actualMatrix[5].low		= 0;
+			actualMatrix[6].high	= 0;
+			actualMatrix[6].low		= 0;
+			actualMatrix[7].high	= 0;
+			actualMatrix[7].low		= 0;
+			actualMatrix[8].high	= 0;
+			actualMatrix[8].low		= 0;
+			actualMatrix[9].high	= 0;
+			actualMatrix[9].low		= 0;
+			actualMatrix[10].high	= 0;
+			actualMatrix[10].low	= 0;
+			actualMatrix[11].high	= 0;
+			actualMatrix[11].low	= 0;
+			break;
+		}
+		
+		// default all other states
+		default:
+		{
+			// do nothing
+			break;
+		}
+	}
 }

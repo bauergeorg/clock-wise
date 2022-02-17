@@ -85,7 +85,7 @@ struct systemParameter
 	uint8_t	potentiometerValue;		// set value of potentiometer (range is 0 low to 255 high)
 	uint8_t displaySetting;			// see display settings description on top
 	uint8_t displayBrightness;		// display brightness (range 0 dark to 255 bright)
-	uint8_t menuState;				// actual menu state
+	uint8_t menuStatus;				// actual menu status
 	uint8_t version;				// software system version
 };
 

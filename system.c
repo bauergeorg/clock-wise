@@ -41,18 +41,18 @@ void initSystem(void)
 	// - x0xx.xxxxb automatic display brightness regulation is inactive
 	// - 1xxx.xxxxb only dot sequence when searching signal
 	systemConfig.displaySetting = 0x80; // see above
-	// set menu state to default
-	systemConfig.menuState = 0;
+	// set menu status to default
+	systemConfig.menuStatus = 0;
 	// system version 0.0.1
 	systemConfig.version = 1;
 	
 	// set init time values
 	// (wedding day from dad and mom) 
 	systemTime.year		= 16;
-	systemTime.month	= 1;
-	systemTime.day		= 4;
-	systemTime.hour		= 11;
-	systemTime.minute	= 0;
+	systemTime.month	= 2;
+	systemTime.day		= 26;
+	systemTime.hour		= 19;
+	systemTime.minute	= 17;
 	systemTime.second	= 0;
 	systemTime.weekday	= 1;
 }

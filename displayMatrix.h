@@ -4,9 +4,9 @@
 *	Date:			04.01.2016
 *
 *	Project-Title:	ClockWise
-*	Description:	µC controlled clock with DCF77, RTC and a led-matrix
+*	Description:	***
 *
-*	File-Title:		Menu Management - Header File
+*	File-Title:		Display Matrix Information - Header File
 *
 *******************************************************************************
 */
@@ -16,5 +16,4 @@
 #include <stdint.h>
 
 //! Functional prototypes
-void menuMgnt(uint8_t switches);
-void menuCancel(void);
+void displayMatrixInformation(uint8_t switchActiviation);
