@@ -17,4 +17,4 @@
 
 //! Functional prototypes
 void initUsart(void);
-void usartReceiveTransmit(uint8_t data);
+uint8_t usartReceiveTransmit(uint8_t data);

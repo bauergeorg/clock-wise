@@ -13,10 +13,10 @@
 * Pin Declaration:
 *	Pin						| Description
 *	------------------------|-------------------------------------------------
-*	PA2 (Pin 38) as input	| Switch 1 - external interrupt PCINT2
-*	PA3 (Pin 37) as input	| Switch 2 - external interrupt PCINT3
-*	PA4 (Pin 36) as input	| Switch 3 - external interrupt PCINT4
-*	PA5 (Pin 35) as input	| Switch 4 - external interrupt PCINT5
+*	PA2 (Pin 38) as input	| Switch 1
+*	PA3 (Pin 37) as input	| Switch 2
+*	PA4 (Pin 36) as input	| Switch 3
+*	PA5 (Pin 35) as input	| Switch 4
 *	------------------------|-------------------------------------------------
 *	PB0 (Pin 1) as output	| Dot 1 LED
 *	PB1 (Pin 2) as output	| Dot 2 LED
@@ -34,8 +34,6 @@
 
 //! Libraries
 #include "gpios.h"
-#include "system.h"
-#include "menu.h"
 
 /*
 // Own global variables
@@ -47,9 +45,6 @@ volatile uint8_t updown = 1; // up = 1, down = 0
 const double DELAY = 100;  // 10µs
 */
 
-//! Extern global variables
-extern volatile struct systemParameter systemConfig;
-
 //! Initialize input and output ports
 void initGpios(void)
 {
@@ -60,51 +55,13 @@ void initGpios(void)
 	PORTB |= (1 << PB7) | (1 << PB6) |(1 << PB5);
 	// switch matrix led for dot's and character off
 	PORTB &= ~((1 << PB4) |(1 << PB3) | (1 << PB2) | (1 << PB1) | (1 << PB0));
-
+	
 	//! Input: Port A
 	// activate PA2 to PA5 as input 
 	DDRA &= ~((1 << PA5) | (1 << PA4) | (1 << PA3) | (1 << PA2));
 	// disable pull-up resistor on input switches
 	PORTA &= ~((1 << PA5) | (1 << PA4) | (1 << PA3) | (1 << PA2));
-
-	//! external interrupt for switch 1, 2, 3 and 4
-	// enabled external pin change interrupts PCINT0:7
-	PCICR |= 1 << PCIE0;
-	// activate PA2 (PCINT2), PA3 (PCINT3), PA4 (PCINT4), PA5 (PCINT5) as external interrupt
-	PCMSK0 |= (1 << PCINT2) | (1 << PCINT3) | (1 << PCINT4) | (1 << PCINT5);
-	// delete flag for interrupts PCINT0:7
-	PCIFR |= 1 << PCIF0;
 }
-
-//! Interrupt Service Routine for switch 1, 2, 3 and 4
-// is called when a switch is pressed in and pressed out
-ISR(PCINT0_vect)
-{
-	// actual values for switches
-	uint8_t switches;
-
-	// get value of switch 1, 2, 3 and 4 - masking with 0011.1100b and shift to right
-	// alternative text: (PINA & ((1<<PINA2) | (1<<PINA3) | (1<<PINA4) | (1<<PINA5)) >> 2; 
-	switches = (PINA & 0x3C) >> 2;
-
-	// any thing else is pressed in the menu mode
-	if(systemConfig.displayStatus >= DISPLAY_STATE_MENU_WAIT)
-	{
-		// call menu management function
-		menuMgnt(switches);
-	}
-
-	// cancel and ok is pressed at the same time in standard mode
-	if((switches & 0x08) && (switches & 0x01) && (systemConfig.displayStatus <= DISPLAY_STATE_MENU_WAIT))
-	{
-		// set new display status: show version
-		systemConfig.displayStatus = DISPLAY_STATE_MENU_WAIT;
-	}
-
-	// delete flag for interrupts PCINT0:7
-	PCIFR |= 1 << PCIF0;
-}
-
 
 //! toggle status led 1 - green
 void toggleStatusGreen(void)

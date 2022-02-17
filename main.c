@@ -15,8 +15,8 @@
 * Status LED:
 * - The green LED toggles every second
 * -	On boot up the yellow led is switched on, the led starts blinking
-*	(on time 0,1s or 0,2s every second), when signals is receiving
-* - The red LED switches off, if time value was decode correctly *!!!!test!!!!!
+*	(on time 0,1s or 0,2s every scond), when signals is receiving
+* - The red LED switches off, if time value was decode correctly
 *
 *******************************************************************************
 *
@@ -43,26 +43,25 @@
 //! Libraries
 //#include <stdint.h>
 #include "settings.h"
-#include "taskMgnt.h"
 #include "system.h"
 #include "dcf77.h"
 #include "ledMatrix.h"
 #include "rtc.h"
 #include "gpios.h"
 #include "timeMgnt.h"
-
 //#include "usart.h"
 #include "adc.h"
 
-//#include <util/delay.h>
+#include <util/delay.h>
 
 //! Extern global variables
 extern volatile struct systemParameter systemConfig;
 extern volatile struct time systemTime;
+	
 extern volatile uint8_t dcfArray[60];
 
 // definition of the pause
-const double DELAYUART = 1;  // 1µs	
+const double DELAYUART = 1;  // 1µs
 	
 //! Main routine
 // just do nothing is the best way ;)
@@ -72,78 +71,30 @@ int main(void)
 //	uint8_t i = 0;
 	
 	// init functions
-	initSystem();		// global settings
-	initGpios();		// external interrupts via switches
-	initTimeMgnt();		// timer 1 for time management
-	initRtc();			// rtc communication
-	initAdc();			// adcs for brightness and
-	initMatrix();		// matrix management
-	initDcf77();		// dcf77 management
-	initTasks();		// task management
-
-	// read light intensity value of adc
-	systemConfig.lightIntensity = calculateIntensity(adcRead(0));
-	// read potentiometer value of adc
-	systemConfig.potentiometerValue = calculatePotiValue(adcRead(1));
-	// calculate display brightness value
-	systemConfig.displayBrightness = calcuateBrightness(systemConfig.lightIntensity, systemConfig.potentiometerValue);
+	initSystem();
+	initGpios();
+	initTimeMgnt();
+//	initRtc();
+	initAdc();
+	initMatrix();	
+	initDcf77();
 
 	// enable global interrupt
 	sei();
 	
-	// switsch off test leds
-	switchOffStatusYellow();
-	switchOffStatusRed();
+	// start receiving
+	startDcf77Signal();
 	
-	// nur übergangsweise für version v0.0.2
-	// nehme default time und suche nicht automatishc im boot-up
-	
-	// set default system status
-	// - xxxx.xxx1b time value available
-	// - xxxx.xx0xb searching dcf77 signal inactive
-	// - xxxx.x0xxb rtc time is not available
-	// - xxxx.0xxxb setting menu is inactive
-	// - xxx0.xxxxb automatic time mode is active
-	systemConfig.status = 0x01;
-
-/*
-	// check for data from rtc
-	// if the rtc communication is failed 
-	if(~getTimeFromRtc())
-	{
-		// start receiving
-		startDcf77Signal();
-		// set default system status
-		// - xxxx.xx1xb searching dcf77 signal active
-		systemConfig.status |= 0x02;
-		// set display status to searching sequence
-		systemConfig.displayStatus = DISPLAY_STATE_SEARCH;
-		// - xxxx.xxx0b no time value available
-		// - xxxx.x0xxb rtc time is not available
-		systemConfig.status &= ~0x05;
-	}
-	else
-	{
-		// set default system status
-		// - xxxx.xxx1b time information in system available
-		// - xxxx.x1xxb rtc time is available
-		systemConfig.status |= 0x05;
-		// - xxxx.xx0xb searching dcf77 signal inactive
-		systemConfig.status &= ~0x02;
-	}
-*/
 	// endless loop
     while (1) 					
-	{
-		// when do nothing
-		checkForTask();
+   {
 		
-		// and
-			// read light intensity value of adc
-			systemConfig.lightIntensity = calculateIntensity(adcRead(0));
-			// read potentiometer value of adc
-			systemConfig.potentiometerValue = calculatePotiValue(adcRead(1));
-			// calculate display brightness value
-			systemConfig.displayBrightness = calcuateBrightness(systemConfig.lightIntensity, systemConfig.potentiometerValue);
+	// when do nothing
+		// read light intensity value of adc
+		systemConfig.lightIntensity = calculateIntensity(adcRead(0));
+		// real potentiometer value of adc
+		systemConfig.potentiometerValue = calculatePotiValue(adcRead(1));
+		// calculate display brightness value
+		systemConfig.displayBrightness = calcuateBrightness(systemConfig.lightIntensity, systemConfig.potentiometerValue);
     }	
 }

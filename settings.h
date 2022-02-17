@@ -25,16 +25,16 @@
 #define PWMVALUE_MAXIMUM 254
 
 // Intensity VDR settings (value range is 8 bit)
-#define INTENSITY_GAIN 3
+#define INTENSITY_GAIN 1
 #define INTENSITY_OFFSET 0
-#define INTENSITY_MINIMUM 0
-#define INTENSITY_MAXIMUM 254
+#define INTENSITY_MINIMUM 10
+#define INTENSITY_MAXIMUM 250
 
 // Poti settings (value range is 8 bit)
 #define POTIVALUE_GAIN 1
 #define POTIVALUE_OFFSET 0
 #define POTIVALUE_MINIMUM 0
-#define POTIVALUE_MAXIMUM 254
+#define POTIVALUE_MAXIMUM 255
 
 // delay time of load signal (pulse width) in µs
 #define DELAYLOAD 1
@@ -46,11 +46,8 @@
 #define DELAYSPI 1
 
 // start signal of led matrix
-#define MATRIXHIGH 0b11111111
-#define MATRIXLOW 0b11110000
-
-// task pre counter value
-#define TASK_PRECOUNTER 15
+#define MATRIXHIGH 0b11111111;
+#define MATRIXLOW 0b11110000;
 
 //! Words - horizontal (in rows)
 #define WORD_ROW00_S_H			0b11000000

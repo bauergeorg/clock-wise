@@ -31,10 +31,4 @@ void resetMatrixShiftRegister(void);
 void loadMatrixShiftRegister(void);
 void enableMatrix(void);
 void disableMatrix(void);
-void setMatrixDark(void);
-void setMatrixBright(void);
-// upper layer functions
 void actualizeMatrixWithSystemTime(void);
-void actualizeMatrixWithSearchingSequence(void);
-void actualizeMatrixInMenuMode(void);
-
