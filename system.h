@@ -10,16 +10,25 @@
 *
 *******************************************************************************
 * Status description: variable 'status' uint8
-*   ------xxb structure of variable
+*   ---xxxxxb structure of variable
 *
-*	------x0b no time information in system available - searching sequence
-*			  is displayed
-*	------x1b time information in system available - a time signal is displayed
+*	----xxx0b no time information in system available
+*			  - the searching sequence is displayed
+*	----xxx1b time information in system available
+*			  - a time signal is displayed (if no menu is selected)
 *
-*	------0xb searching for dcf77-signal is inactive
-*	------1xb searching for dcf77-signal is active
+*	----xx0xb searching for dcf77-signal is inactive
+*	----xx1xb searching for dcf77-signal is active
 *
-* 
+*	----x0xxb rtc time is not available
+*	----x1xxb rtc time is available
+*
+*	----0xxxb setting menu is inactive
+*	----1xxxb setting menu is active
+*
+*	---0xxxxb automatic time mode is active
+*	---1xxxxb manual time mode is active
+*
 *******************************************************************************
 * Display Settings: variable "displaySetting" unint8
 *	vwxxyyyzb structure of variable

@@ -719,8 +719,12 @@ void actualizeMatrixWithSystemTime()
 			actualMatrix[11].high	= 0b00000000;
 			actualMatrix[11].low	= 0b00000000;
 		}
-/*		
-		// blink blink blink -- only for testing!!!! binary date time
+}
+
+// actualize 'actualMatrix' Register with manual time
+void actualizeMatrixWithManualTime()
+{
+		// binary date time
 		actualMatrix[5].high	= systemTime.hour;
 		actualMatrix[5].low		= 0;
 		actualMatrix[6].high	= systemTime.minute;
@@ -735,5 +739,10 @@ void actualizeMatrixWithSystemTime()
 		actualMatrix[10].low	= 0;
 		actualMatrix[11].high	= systemTime.weekday;
 		actualMatrix[11].low	= 0;
-		*/
+}
+
+// actualize 'actualMatrix' or dots with Register with manual time
+void searchingSeaquence()
+{
+	
 }

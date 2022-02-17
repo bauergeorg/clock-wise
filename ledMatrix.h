@@ -34,3 +34,4 @@ void disableMatrix(void);
 void setMatrixDark(void);
 void setMatrixBright(void);
 void actualizeMatrixWithSystemTime(void);
+void actualizeMatrixWithManualTime(void);

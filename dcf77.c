@@ -424,9 +424,6 @@ void decodeDcf77(void)
 		systemTime.year = year;
 		systemTime.weekday = weekday;
 		
-		// switch off status led red
-		switchOffStatusRed();
-		
 		// time information in system available - a time will displayed
 		systemConfig.status |= 0x01;
 		

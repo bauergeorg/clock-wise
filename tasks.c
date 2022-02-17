@@ -63,18 +63,18 @@ void taskFiveMinute(void)
 //! Task minute
 void taskMinute(void)
 {
-	
+
 }
 
 //! Task second
 void taskSecond(void)
 {
-	uint8_t i = 0;
+	// uint8_t i = 0;
 	static uint8_t state = 0;
 	
 	// toggle status led
 	toggleStatusGreen();
-	
+		
 	// if time signal is available
 	// display time and dot action
 	if (systemConfig.status & 0x01)
@@ -90,7 +90,7 @@ void taskSecond(void)
 	{
 		// check searching mode: square (0) or dots only (1)
 		// searching mode: dots only (1)
-		if(0x80 & systemConfig.displaySetting)
+		if(systemConfig.displaySetting & 0x80)
 		{
 			setMatrixDark();
 			// display dot session
@@ -135,6 +135,11 @@ void taskSecond(void)
 			}
 		}
 		
+		else
+		{
+			acutalDot = 0b00000000;
+		}
+		/*
 		// searching mode: square (0)
 		else
 		{	
@@ -379,6 +384,7 @@ void taskSecond(void)
 			}
 			
 		}
+		*/
 		
 	}
 }

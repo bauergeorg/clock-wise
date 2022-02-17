@@ -16,7 +16,7 @@
 * - The green LED toggles every second
 * -	On boot up the yellow led is switched on, the led starts blinking
 *	(on time 0,1s or 0,2s every second), when signals is receiving
-* - The red LED switches off, if time value was decode correctly
+* - The red LED switches off, if time value was decode correctly *!!!!test!!!!!
 *
 *******************************************************************************
 *
@@ -93,7 +93,7 @@ int main(void)
 	
 	// start receiving
 	startDcf77Signal();
-	
+		
 	// endless loop
     while (1) 					
    {
