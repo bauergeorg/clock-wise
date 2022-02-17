@@ -30,6 +30,10 @@
 *	---1xxxxb manual time mode is active
 *
 *******************************************************************************
+* Status description: variable 'menuState' uint8
+*	see menu.c file
+*
+*******************************************************************************
 * Display Settings: variable "displaySetting" unint8
 *	vwxxyyyzb structure of variable
 *
@@ -61,12 +65,6 @@
 #include <stdint.h>
 //#include <stdlib.h>
 
-
-/*//! Own global variables
-extern struct systemParameter systemConfig;
-extern struct time systemTime;*/
-
-
 //! System Time Structure
 struct time
 {
@@ -87,6 +85,8 @@ struct systemParameter
 	uint8_t	potentiometerValue;		// set value of potentiometer (range is 0 low to 255 high)
 	uint8_t displaySetting;			// see display settings description on top
 	uint8_t displayBrightness;		// display brightness (range 0 dark to 255 bright)
+	uint8_t menuState;				// actual menu state
+	uint8_t version;				// software system version
 };
 
 //! Functional prototypes

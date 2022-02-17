@@ -112,8 +112,7 @@ void calculateTaskTiming(void)
 void checkForTask(void)
 {
 	// priority is from high frequent task to low frequent task
-	
-	
+		
 	// half second task
 	if (taskFlags & 0b00000001)
 	{

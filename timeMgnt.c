@@ -34,7 +34,6 @@
 extern volatile struct time systemTime;
 extern volatile struct systemParameter systemConfig;
 
-
 //! Write Initial values
 void initTimeMgnt(void)
 {

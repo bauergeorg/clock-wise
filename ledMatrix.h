@@ -33,5 +33,8 @@ void enableMatrix(void);
 void disableMatrix(void);
 void setMatrixDark(void);
 void setMatrixBright(void);
+// upper layer functions
 void actualizeMatrixWithSystemTime(void);
-void actualizeMatrixWithManualTime(void);
+void actualizeMatrixWithSearchingSequence(void);
+void actualizeMatrixInMenuMode(void);
+

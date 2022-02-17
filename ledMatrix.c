@@ -334,365 +334,378 @@ void setMatrixBright()
 // actualize 'actualMatrix' Register with system time
 void actualizeMatrixWithSystemTime()
 {
-		uint8_t actualHour	= 0;
-		int8_t add			= 0;
+	// change every minute the active dot
+	acutalDot = 0x01 << (systemTime.minute % 5);
+		
+	uint8_t actualHour	= 0;
+	int8_t add			= 0;
 
-		// check straight pie (0) or shift pie (1)
-		if(0x01 & systemConfig.displaySetting)
-		{
-			add = -2;
-		}
+	// check straight pie (0) or shift pie (1)
+	if(systemConfig.displaySetting & 0x01)
+	{
+		add = -2;
+	}
 		
-		// it is exactly full hour, half and quarter past, quarter to
-		if ((systemTime.minute >= ((60 + add) % 60) && systemTime.minute < (5 + add))  ||
-			(systemTime.minute >= (15 + add) && systemTime.minute < (20 + add)) ||
-			(systemTime.minute >= (30 + add) && systemTime.minute < (35 + add)) ||
-			(systemTime.minute >= (45 + add) && systemTime.minute < (50 + add)))
-		{
-			actualMatrix[0].high	= WORD_ROW00_S_H | WORD_ROW00_IS_H | WORD_ROW00_GRAD_H;
-			actualMatrix[0].low		= WORD_ROW00_S_L | WORD_ROW00_IS_L | WORD_ROW00_GRAD_L;
-		}
-		else
-		{
-			actualMatrix[0].high	= WORD_ROW00_S_H | WORD_ROW00_IS_H;
-			actualMatrix[0].low		= WORD_ROW00_S_L | WORD_ROW00_IS_L;
-		}
+	// it is exactly full hour, half and quarter past, quarter to
+	if ((systemTime.minute >= ((60 + add) % 60) && systemTime.minute < (5 + add))  ||
+		(systemTime.minute >= (15 + add) && systemTime.minute < (20 + add)) ||
+		(systemTime.minute >= (30 + add) && systemTime.minute < (35 + add)) ||
+		(systemTime.minute >= (45 + add) && systemTime.minute < (50 + add)))
+	{
+		actualMatrix[0].high	= WORD_ROW00_S_H | WORD_ROW00_IS_H | WORD_ROW00_GRAD_H;
+		actualMatrix[0].low		= WORD_ROW00_S_L | WORD_ROW00_IS_L | WORD_ROW00_GRAD_L;
+	}
+	else
+	{
+		actualMatrix[0].high	= WORD_ROW00_S_H | WORD_ROW00_IS_H;
+		actualMatrix[0].low		= WORD_ROW00_S_L | WORD_ROW00_IS_L;
+	}
 				
-		// past
-		if ((systemTime.minute >= (5 + add) && systemTime.minute < (10 + add))   ||
-			(systemTime.minute >= (20 + add) && systemTime.minute < (25 + add)) ||
-			(systemTime.minute >= (35 + add) && systemTime.minute < (40 + add)) ||
-			(systemTime.minute >= (50 + add) && systemTime.minute < (55 + add)))
-		{
-			actualMatrix[1].high	= WORD_ROW01_KORZ_H | WORD_ROW01_NOCH_H;
-			actualMatrix[1].low		= WORD_ROW01_KORZ_L | WORD_ROW01_NOCH_L;
-		}
-		else
-		{
-			actualMatrix[1].high	= 0b00000000;
-			actualMatrix[1].low		= 0b00000000;
-		}
+	// past
+	if ((systemTime.minute >= (5 + add) && systemTime.minute < (10 + add))   ||
+		(systemTime.minute >= (20 + add) && systemTime.minute < (25 + add)) ||
+		(systemTime.minute >= (35 + add) && systemTime.minute < (40 + add)) ||
+		(systemTime.minute >= (50 + add) && systemTime.minute < (55 + add)))
+	{
+		actualMatrix[1].high	= WORD_ROW01_KORZ_H | WORD_ROW01_NOCH_H;
+		actualMatrix[1].low		= WORD_ROW01_KORZ_L | WORD_ROW01_NOCH_L;
+	}
+	else
+	{
+		actualMatrix[1].high	= 0b00000000;
+		actualMatrix[1].low		= 0b00000000;
+	}
 		
-		// to
-		if ((systemTime.minute >= (10 + add) && systemTime.minute < (15 + add))  ||
-			(systemTime.minute >= (40 + add) && systemTime.minute < (45 + add)) ||
-			(systemTime.minute >= (55 + add) && systemTime.minute < (60 + add)))
-		{
-			actualMatrix[2].high	= WORD_ROW02_GLEI_H;
-			actualMatrix[2].low		= WORD_ROW02_GLEI_L;
-		}
-		else
-		{
-			actualMatrix[2].high	= 0b00000000;
-			actualMatrix[2].low		= 0b00000000;
-		}
+	// to
+	if ((systemTime.minute >= (10 + add) && systemTime.minute < (15 + add))  ||
+		(systemTime.minute >= (40 + add) && systemTime.minute < (45 + add)) ||
+		(systemTime.minute >= (55 + add) && systemTime.minute < (60 + add)))
+	{
+		actualMatrix[2].high	= WORD_ROW02_GLEI_H;
+		actualMatrix[2].low		= WORD_ROW02_GLEI_L;
+	}
+	else
+	{
+		actualMatrix[2].high	= 0b00000000;
+		actualMatrix[2].low		= 0b00000000;
+	}
 		
-		// to and half
-		if (systemTime.minute >= (25 + add) && systemTime.minute < (30 + add))
-		{
-			actualMatrix[2].high	= WORD_ROW02_GLEI_H | WORD_ROW02_HALWA_H;
-			actualMatrix[2].low		= WORD_ROW02_GLEI_L | WORD_ROW02_HALWA_L;
-		}
+	// to and half
+	if (systemTime.minute >= (25 + add) && systemTime.minute < (30 + add))
+	{
+		actualMatrix[2].high	= WORD_ROW02_GLEI_H | WORD_ROW02_HALWA_H;
+		actualMatrix[2].low		= WORD_ROW02_GLEI_L | WORD_ROW02_HALWA_L;
+	}
 		
-		// half
-		if (systemTime.minute >= (30 + add) && systemTime.minute < (40 + add))
-		{
-			actualMatrix[2].high	= WORD_ROW02_HALWA_H;
-			actualMatrix[2].low		= WORD_ROW02_HALWA_L;
-		}
+	// half
+	if (systemTime.minute >= (30 + add) && systemTime.minute < (40 + add))
+	{
+		actualMatrix[2].high	= WORD_ROW02_HALWA_H;
+		actualMatrix[2].low		= WORD_ROW02_HALWA_L;
+	}
 				
-		// quarter past
-		if (systemTime.minute >= (10 + add) && systemTime.minute < (25 + add))
-		{
-			actualMatrix[3].high	= WORD_ROW03_VAEDDL_H;
-			actualMatrix[3].low		= WORD_ROW03_VAEDDL_L;
-		}
-		else
-		{
-			actualMatrix[3].high	= 0b00000000;
-			actualMatrix[3].low		= 0b00000000;
-		}
+	// quarter past
+	if (systemTime.minute >= (10 + add) && systemTime.minute < (25 + add))
+	{
+		actualMatrix[3].high	= WORD_ROW03_VAEDDL_H;
+		actualMatrix[3].low		= WORD_ROW03_VAEDDL_L;
+	}
+	else
+	{
+		actualMatrix[3].high	= 0b00000000;
+		actualMatrix[3].low		= 0b00000000;
+	}
 		
-		// quarter to
-		if (systemTime.minute >= (40 + add) && systemTime.minute < (55 + add))
-		{
-			actualMatrix[3].high	= WORD_ROW03_DREI_H | WORD_ROW03_VAEDDL_H;
-			actualMatrix[3].low		= WORD_ROW03_DREI_L | WORD_ROW03_VAEDDL_L;
-		}
+	// quarter to
+	if (systemTime.minute >= (40 + add) && systemTime.minute < (55 + add))
+	{
+		actualMatrix[3].high	= WORD_ROW03_DREI_H | WORD_ROW03_VAEDDL_H;
+		actualMatrix[3].low		= WORD_ROW03_DREI_L | WORD_ROW03_VAEDDL_L;
+	}
 		
-		// no birthday
-			actualMatrix[4].high	= 0;
-			actualMatrix[4].low		= 0;
+	// no birthday
+		actualMatrix[4].high	= 0;
+		actualMatrix[4].low		= 0;
 		
-		// calculate display hour
-		if (systemTime.minute >= (10 + add))
-		{
-			actualHour = systemTime.hour + 1;
-		}
-		else
-		{
-			actualHour = systemTime.hour;
-		}
+	// calculate display hour
+	if (systemTime.minute >= (10 + add))
+	{
+		actualHour = systemTime.hour + 1;
+	}
+	else
+	{
+		actualHour = systemTime.hour;
+	}
 		
-		// hour
-		switch(actualHour)
-		{
-			case 0: case 12: case 24:
-				// midnight, twelve
-				actualMatrix[5].high	= 0b00000000;
-				actualMatrix[5].low		= 0b00000000;
-				actualMatrix[6].high	= WORD_ROW06_ZWOELFE_H;
-				actualMatrix[6].low		= WORD_ROW06_ZWOELFE_L;
-				actualMatrix[7].high	= 0b00000000;
-				actualMatrix[7].low		= 0b00000000;
-				actualMatrix[8].high	= 0b00000000;
-				actualMatrix[8].low		= 0b00000000;
-				actualMatrix[9].high	= 0b00000000;
-				actualMatrix[9].low		= 0b00000000;
-				actualMatrix[10].high	= 0b00000000;
-				actualMatrix[10].low	= 0b00000000;
-				actualMatrix[11].high	= 0b00000000;
-				actualMatrix[11].low	= 0b00000000;
-				break;
-			case 1: case 13:
-				// one, thirteen
-				actualMatrix[5].high	= WORD_ROW05_OHNSE_H;
-				actualMatrix[5].low		= WORD_ROW05_OHNSE_L;
-				actualMatrix[6].high	= 0b00000000;
-				actualMatrix[6].low		= 0b00000000;
-				actualMatrix[7].high	= 0b00000000;
-				actualMatrix[7].low		= 0b00000000;
-				actualMatrix[8].high	= 0b00000000;
-				actualMatrix[8].low		= 0b00000000;
-				actualMatrix[9].high	= 0b00000000;
-				actualMatrix[9].low		= 0b00000000;
-				actualMatrix[10].high	= 0b00000000;
-				actualMatrix[10].low	= 0b00000000;
-				actualMatrix[11].high	= 0b00000000;
-				actualMatrix[11].low	= 0b00000000;
-				break;
-			case 2: case 14:
-				// two, fourteen
-				actualMatrix[5].high	= 0b00000000;
-				actualMatrix[5].low		= 0b00000000;
-				actualMatrix[6].high	= 0b00000000;
-				actualMatrix[6].low		= 0b00000000;
-				actualMatrix[7].high	= 0b00000000;
-				actualMatrix[7].low		= 0b00000000;
-				actualMatrix[8].high	= 0b00000000;
-				actualMatrix[8].low		= 0b00000000;
-				actualMatrix[9].high	= 0b00000000;
-				actualMatrix[9].low		= 0b00000000;
-				actualMatrix[10].high	= 0b00000000;
-				actualMatrix[10].low	= 0b00000000;
-				actualMatrix[11].high	= WORD_ROW11_ZWEH_H;
-				actualMatrix[11].low	= WORD_ROW11_ZWEH_L;
-				break;
-			case 3: case 15:
-				// three, fifteen
-				actualMatrix[5].high	= 0b00000000;
-				actualMatrix[5].low		= 0b00000000;
-				actualMatrix[6].high	= 0b00000000;
-				actualMatrix[6].low		= 0b00000000;
-				actualMatrix[7].high	= 0b00000000;
-				actualMatrix[7].low		= 0b00000000;
-				actualMatrix[8].high	= 0b00000000;
-				actualMatrix[8].low		= 0b00000000;
-				actualMatrix[9].high	= WORD_ROW09_DREI_H;
-				actualMatrix[9].low		= WORD_ROW09_DREI_L;
-				actualMatrix[10].high	= 0b00000000;
-				actualMatrix[10].low	= 0b00000000;
-				actualMatrix[11].high	= 0b00000000;
-				actualMatrix[11].low	= 0b00000000;
-				break;
-			case 4: case 16:
-				// four, sixteen
-				actualMatrix[5].high	= 0b00000000;
-				actualMatrix[5].low		= 0b00000000;
-				actualMatrix[6].high	= 0b00000000;
-				actualMatrix[6].low		= 0b00000000;
-				actualMatrix[7].high	= WORD_ROW07_VIERE_H;
-				actualMatrix[7].low		= WORD_ROW07_VIERE_L;
-				actualMatrix[8].high	= 0b00000000;
-				actualMatrix[8].low		= 0b00000000;
-				actualMatrix[9].high	= 0b00000000;
-				actualMatrix[9].low		= 0b00000000;
-				actualMatrix[10].high	= 0b00000000;
-				actualMatrix[10].low	= 0b00000000;
-				actualMatrix[11].high	= 0b00000000;
-				actualMatrix[11].low	= 0b00000000;
-				break;
-			case 5: case 17:
-				// fife, seventeen
-				actualMatrix[5].high	= WORD_ROW05_FUENFE_H;
-				actualMatrix[5].low		= WORD_ROW05_FUENFE_L;
-				actualMatrix[6].high	= 0b00000000;
-				actualMatrix[6].low		= 0b00000000;
-				actualMatrix[7].high	= 0b00000000;
-				actualMatrix[7].low		= 0b00000000;
-				actualMatrix[8].high	= 0b00000000;
-				actualMatrix[8].low		= 0b00000000;
-				actualMatrix[9].high	= 0b00000000;
-				actualMatrix[9].low		= 0b00000000;
-				actualMatrix[10].high	= 0b00000000;
-				actualMatrix[10].low	= 0b00000000;
-				actualMatrix[11].high	= 0b00000000;
-				actualMatrix[11].low	= 0b00000000;
-				break;
-			case 6: case 18:
-				// six, eighteen
-				actualMatrix[5].high	= 0b00000000;
-				actualMatrix[5].low		= 0b00000000;
-				actualMatrix[6].high	= 0b00000000;
-				actualMatrix[6].low		= 0b00000000;
-				actualMatrix[7].high	= 0b00000000;
-				actualMatrix[7].low		= 0b00000000;
-				actualMatrix[8].high	= WORD_ROW08_SECHSE_H;
-				actualMatrix[8].low		= WORD_ROW08_SECHSE_L;
-				actualMatrix[9].high	= 0b00000000;
-				actualMatrix[9].low		= 0b00000000;
-				actualMatrix[10].high	= 0b00000000;
-				actualMatrix[10].low	= 0b00000000;
-				actualMatrix[11].high	= 0b00000000;
-				actualMatrix[11].low	= 0b00000000;
-				break;
-			case 7: case 19:
-				// seven, nineteen
-				actualMatrix[5].high	= 0b00000000;
-				actualMatrix[5].low		= 0b00000000;
-				actualMatrix[6].high	= 0b00000000;
-				actualMatrix[6].low		= 0b00000000;
-				actualMatrix[7].high	= 0b00000000;
-				actualMatrix[7].low		= 0b00000000;
-				actualMatrix[8].high	= 0b00000000;
-				actualMatrix[8].low		= 0b00000000;
-				actualMatrix[9].high	= WORD_ROW09_SIWWENE_H;
-				actualMatrix[9].low		= WORD_ROW09_SIWWENE_L;
-				actualMatrix[10].high	= 0b00000000;
-				actualMatrix[10].low	= 0b00000000;
-				actualMatrix[11].high	= 0b00000000;
-				actualMatrix[11].low	= 0b00000000;
-				break;
-			case 8: case 20:
-				// eight, twenty
-				actualMatrix[5].high	= 0b00000000;
-				actualMatrix[5].low		= 0b00000000;
-				actualMatrix[6].high	= 0b00000000;
-				actualMatrix[6].low		= 0b00000000;
-				actualMatrix[7].high	= 0b00000000;
-				actualMatrix[7].low		= 0b00000000;
-				actualMatrix[8].high	= 0b00000000;
-				actualMatrix[8].low		= 0b00000000;
-				actualMatrix[9].high	= 0b00000000;
-				actualMatrix[9].low		= 0b00000000;
-				actualMatrix[10].high	= WORD_ROW10_ACHDE_H;
-				actualMatrix[10].low	= WORD_ROW10_ACHDE_L;
-				actualMatrix[11].high	= 0b00000000;
-				actualMatrix[11].low	= 0b00000000;
-				break;
-			case 9: case 21:
-				// nine, twenty-one
-				actualMatrix[5].high	= 0b00000000;
-				actualMatrix[5].low		= 0b00000000;
-				actualMatrix[6].high	= 0b00000000;
-				actualMatrix[6].low		= 0b00000000;
-				actualMatrix[7].high	= 0b00000000;
-				actualMatrix[7].low		= 0b00000000;
-				actualMatrix[8].high	= 0b00000000;
-				actualMatrix[8].low		= 0b00000000;
-				actualMatrix[9].high	= 0b00000000;
-				actualMatrix[9].low		= 0b00000000;
-				actualMatrix[10].high	= 0b00000000;
-				actualMatrix[10].low	= 0b00000000;
-				actualMatrix[11].high	= WORD_ROW11_NEUNE_H;
-				actualMatrix[11].low	= WORD_ROW11_NEUNE_L;
-				break;
-			case 10: case 22:
-				// ten, twenty-two
-				actualMatrix[5].high	= 0b00000000;
-				actualMatrix[5].low		= 0b00000000;
-				actualMatrix[6].high	= 0b00000000;
-				actualMatrix[6].low		= 0b00000000;
-				actualMatrix[7].high	= 0b00000000;
-				actualMatrix[7].low		= 0b00000000;
-				actualMatrix[8].high	= 0b00000000;
-				actualMatrix[8].low		= 0b00000000;
-				actualMatrix[9].high	= 0b00000000;
-				actualMatrix[9].low		= 0b00000000;
-				actualMatrix[10].high	= 0b00000000;
-				actualMatrix[10].low	= 0b00000000;
-				actualMatrix[11].high	= WORD_ROW11_ZEHNE_H;
-				actualMatrix[11].low	= WORD_ROW11_ZEHNE_L;
-				break;
-			case 11: case 23:
-				// eleven, twenty-three
-				actualMatrix[5].high	= 0b00000000;
-				actualMatrix[5].low		= 0b00000000;
-				actualMatrix[6].high	= 0b00000000;
-				actualMatrix[6].low		= 0b00000000;
-				actualMatrix[7].high	= 0b00000000;
-				actualMatrix[7].low		= 0b00000000;
-				actualMatrix[8].high	= WORD_ROW08_ELFE_H;
-				actualMatrix[8].low		= WORD_ROW08_ELFE_L;
-				actualMatrix[9].high	= 0b00000000;
-				actualMatrix[9].low		= 0b00000000;
-				actualMatrix[10].high	= 0b00000000;
-				actualMatrix[10].low	= 0b00000000;
-				actualMatrix[11].high	= 0b00000000;
-				actualMatrix[11].low	= 0b00000000;
-				break;
-			default:
-				actualMatrix[5].high	= 0b00000000;
-				actualMatrix[5].low		= 0b00000000;
-				actualMatrix[6].high	= 0b00000000;
-				actualMatrix[6].low		= 0b00000000;
-				actualMatrix[7].high	= 0b00000000;
-				actualMatrix[7].low		= 0b00000000;
-				actualMatrix[8].high	= 0b00000000;
-				actualMatrix[8].low		= 0b00000000;
-				actualMatrix[9].high	= 0b00000000;
-				actualMatrix[9].low		= 0b00000000;
-				actualMatrix[10].high	= 0b00000000;
-				actualMatrix[10].low	= 0b00000000;
-				actualMatrix[11].high	= 0b00000000;
-				actualMatrix[11].low	= 0b00000000;
-				break;
-		}
+	// hour
+	switch(actualHour)
+	{
+		case 0: case 12: case 24:
+			// midnight, twelve
+			actualMatrix[5].high	= 0b00000000;
+			actualMatrix[5].low		= 0b00000000;
+			actualMatrix[6].high	= WORD_ROW06_ZWOELFE_H;
+			actualMatrix[6].low		= WORD_ROW06_ZWOELFE_L;
+			actualMatrix[7].high	= 0b00000000;
+			actualMatrix[7].low		= 0b00000000;
+			actualMatrix[8].high	= 0b00000000;
+			actualMatrix[8].low		= 0b00000000;
+			actualMatrix[9].high	= 0b00000000;
+			actualMatrix[9].low		= 0b00000000;
+			actualMatrix[10].high	= 0b00000000;
+			actualMatrix[10].low	= 0b00000000;
+			actualMatrix[11].high	= 0b00000000;
+			actualMatrix[11].low	= 0b00000000;
+			break;
+		case 1: case 13:
+			// one, thirteen
+			actualMatrix[5].high	= WORD_ROW05_OHNSE_H;
+			actualMatrix[5].low		= WORD_ROW05_OHNSE_L;
+			actualMatrix[6].high	= 0b00000000;
+			actualMatrix[6].low		= 0b00000000;
+			actualMatrix[7].high	= 0b00000000;
+			actualMatrix[7].low		= 0b00000000;
+			actualMatrix[8].high	= 0b00000000;
+			actualMatrix[8].low		= 0b00000000;
+			actualMatrix[9].high	= 0b00000000;
+			actualMatrix[9].low		= 0b00000000;
+			actualMatrix[10].high	= 0b00000000;
+			actualMatrix[10].low	= 0b00000000;
+			actualMatrix[11].high	= 0b00000000;
+			actualMatrix[11].low	= 0b00000000;
+			break;
+		case 2: case 14:
+			// two, fourteen
+			actualMatrix[5].high	= 0b00000000;
+			actualMatrix[5].low		= 0b00000000;
+			actualMatrix[6].high	= 0b00000000;
+			actualMatrix[6].low		= 0b00000000;
+			actualMatrix[7].high	= 0b00000000;
+			actualMatrix[7].low		= 0b00000000;
+			actualMatrix[8].high	= 0b00000000;
+			actualMatrix[8].low		= 0b00000000;
+			actualMatrix[9].high	= 0b00000000;
+			actualMatrix[9].low		= 0b00000000;
+			actualMatrix[10].high	= 0b00000000;
+			actualMatrix[10].low	= 0b00000000;
+			actualMatrix[11].high	= WORD_ROW11_ZWEH_H;
+			actualMatrix[11].low	= WORD_ROW11_ZWEH_L;
+			break;
+		case 3: case 15:
+			// three, fifteen
+			actualMatrix[5].high	= 0b00000000;
+			actualMatrix[5].low		= 0b00000000;
+			actualMatrix[6].high	= 0b00000000;
+			actualMatrix[6].low		= 0b00000000;
+			actualMatrix[7].high	= 0b00000000;
+			actualMatrix[7].low		= 0b00000000;
+			actualMatrix[8].high	= 0b00000000;
+			actualMatrix[8].low		= 0b00000000;
+			actualMatrix[9].high	= WORD_ROW09_DREI_H;
+			actualMatrix[9].low		= WORD_ROW09_DREI_L;
+			actualMatrix[10].high	= 0b00000000;
+			actualMatrix[10].low	= 0b00000000;
+			actualMatrix[11].high	= 0b00000000;
+			actualMatrix[11].low	= 0b00000000;
+			break;
+		case 4: case 16:
+			// four, sixteen
+			actualMatrix[5].high	= 0b00000000;
+			actualMatrix[5].low		= 0b00000000;
+			actualMatrix[6].high	= 0b00000000;
+			actualMatrix[6].low		= 0b00000000;
+			actualMatrix[7].high	= WORD_ROW07_VIERE_H;
+			actualMatrix[7].low		= WORD_ROW07_VIERE_L;
+			actualMatrix[8].high	= 0b00000000;
+			actualMatrix[8].low		= 0b00000000;
+			actualMatrix[9].high	= 0b00000000;
+			actualMatrix[9].low		= 0b00000000;
+			actualMatrix[10].high	= 0b00000000;
+			actualMatrix[10].low	= 0b00000000;
+			actualMatrix[11].high	= 0b00000000;
+			actualMatrix[11].low	= 0b00000000;
+			break;
+		case 5: case 17:
+			// fife, seventeen
+			actualMatrix[5].high	= WORD_ROW05_FUENFE_H;
+			actualMatrix[5].low		= WORD_ROW05_FUENFE_L;
+			actualMatrix[6].high	= 0b00000000;
+			actualMatrix[6].low		= 0b00000000;
+			actualMatrix[7].high	= 0b00000000;
+			actualMatrix[7].low		= 0b00000000;
+			actualMatrix[8].high	= 0b00000000;
+			actualMatrix[8].low		= 0b00000000;
+			actualMatrix[9].high	= 0b00000000;
+			actualMatrix[9].low		= 0b00000000;
+			actualMatrix[10].high	= 0b00000000;
+			actualMatrix[10].low	= 0b00000000;
+			actualMatrix[11].high	= 0b00000000;
+			actualMatrix[11].low	= 0b00000000;
+			break;
+		case 6: case 18:
+			// six, eighteen
+			actualMatrix[5].high	= 0b00000000;
+			actualMatrix[5].low		= 0b00000000;
+			actualMatrix[6].high	= 0b00000000;
+			actualMatrix[6].low		= 0b00000000;
+			actualMatrix[7].high	= 0b00000000;
+			actualMatrix[7].low		= 0b00000000;
+			actualMatrix[8].high	= WORD_ROW08_SECHSE_H;
+			actualMatrix[8].low		= WORD_ROW08_SECHSE_L;
+			actualMatrix[9].high	= 0b00000000;
+			actualMatrix[9].low		= 0b00000000;
+			actualMatrix[10].high	= 0b00000000;
+			actualMatrix[10].low	= 0b00000000;
+			actualMatrix[11].high	= 0b00000000;
+			actualMatrix[11].low	= 0b00000000;
+			break;
+		case 7: case 19:
+			// seven, nineteen
+			actualMatrix[5].high	= 0b00000000;
+			actualMatrix[5].low		= 0b00000000;
+			actualMatrix[6].high	= 0b00000000;
+			actualMatrix[6].low		= 0b00000000;
+			actualMatrix[7].high	= 0b00000000;
+			actualMatrix[7].low		= 0b00000000;
+			actualMatrix[8].high	= 0b00000000;
+			actualMatrix[8].low		= 0b00000000;
+			actualMatrix[9].high	= WORD_ROW09_SIWWENE_H;
+			actualMatrix[9].low		= WORD_ROW09_SIWWENE_L;
+			actualMatrix[10].high	= 0b00000000;
+			actualMatrix[10].low	= 0b00000000;
+			actualMatrix[11].high	= 0b00000000;
+			actualMatrix[11].low	= 0b00000000;
+			break;
+		case 8: case 20:
+			// eight, twenty
+			actualMatrix[5].high	= 0b00000000;
+			actualMatrix[5].low		= 0b00000000;
+			actualMatrix[6].high	= 0b00000000;
+			actualMatrix[6].low		= 0b00000000;
+			actualMatrix[7].high	= 0b00000000;
+			actualMatrix[7].low		= 0b00000000;
+			actualMatrix[8].high	= 0b00000000;
+			actualMatrix[8].low		= 0b00000000;
+			actualMatrix[9].high	= 0b00000000;
+			actualMatrix[9].low		= 0b00000000;
+			actualMatrix[10].high	= WORD_ROW10_ACHDE_H;
+			actualMatrix[10].low	= WORD_ROW10_ACHDE_L;
+			actualMatrix[11].high	= 0b00000000;
+			actualMatrix[11].low	= 0b00000000;
+			break;
+		case 9: case 21:
+			// nine, twenty-one
+			actualMatrix[5].high	= 0b00000000;
+			actualMatrix[5].low		= 0b00000000;
+			actualMatrix[6].high	= 0b00000000;
+			actualMatrix[6].low		= 0b00000000;
+			actualMatrix[7].high	= 0b00000000;
+			actualMatrix[7].low		= 0b00000000;
+			actualMatrix[8].high	= 0b00000000;
+			actualMatrix[8].low		= 0b00000000;
+			actualMatrix[9].high	= 0b00000000;
+			actualMatrix[9].low		= 0b00000000;
+			actualMatrix[10].high	= 0b00000000;
+			actualMatrix[10].low	= 0b00000000;
+			actualMatrix[11].high	= WORD_ROW11_NEUNE_H;
+			actualMatrix[11].low	= WORD_ROW11_NEUNE_L;
+			break;
+		case 10: case 22:
+			// ten, twenty-two
+			actualMatrix[5].high	= 0b00000000;
+			actualMatrix[5].low		= 0b00000000;
+			actualMatrix[6].high	= 0b00000000;
+			actualMatrix[6].low		= 0b00000000;
+			actualMatrix[7].high	= 0b00000000;
+			actualMatrix[7].low		= 0b00000000;
+			actualMatrix[8].high	= 0b00000000;
+			actualMatrix[8].low		= 0b00000000;
+			actualMatrix[9].high	= 0b00000000;
+			actualMatrix[9].low		= 0b00000000;
+			actualMatrix[10].high	= 0b00000000;
+			actualMatrix[10].low	= 0b00000000;
+			actualMatrix[11].high	= WORD_ROW11_ZEHNE_H;
+			actualMatrix[11].low	= WORD_ROW11_ZEHNE_L;
+			break;
+		case 11: case 23:
+			// eleven, twenty-three
+			actualMatrix[5].high	= 0b00000000;
+			actualMatrix[5].low		= 0b00000000;
+			actualMatrix[6].high	= 0b00000000;
+			actualMatrix[6].low		= 0b00000000;
+			actualMatrix[7].high	= 0b00000000;
+			actualMatrix[7].low		= 0b00000000;
+			actualMatrix[8].high	= WORD_ROW08_ELFE_H;
+			actualMatrix[8].low		= WORD_ROW08_ELFE_L;
+			actualMatrix[9].high	= 0b00000000;
+			actualMatrix[9].low		= 0b00000000;
+			actualMatrix[10].high	= 0b00000000;
+			actualMatrix[10].low	= 0b00000000;
+			actualMatrix[11].high	= 0b00000000;
+			actualMatrix[11].low	= 0b00000000;
+			break;
+		default:
+			actualMatrix[5].high	= 0b00000000;
+			actualMatrix[5].low		= 0b00000000;
+			actualMatrix[6].high	= 0b00000000;
+			actualMatrix[6].low		= 0b00000000;
+			actualMatrix[7].high	= 0b00000000;
+			actualMatrix[7].low		= 0b00000000;
+			actualMatrix[8].high	= 0b00000000;
+			actualMatrix[8].low		= 0b00000000;
+			actualMatrix[9].high	= 0b00000000;
+			actualMatrix[9].low		= 0b00000000;
+			actualMatrix[10].high	= 0b00000000;
+			actualMatrix[10].low	= 0b00000000;
+			actualMatrix[11].high	= 0b00000000;
+			actualMatrix[11].low	= 0b00000000;
+			break;
+	}
 		
-		//! special cases
+	//! special cases
+	if(systemConfig.displaySetting & 0x02)
+	{
 		// time to feed horses
 		if (((actualHour ==  18) && (systemTime.minute >= 53) && (systemTime.minute < 8)) ||
-			((actualHour ==  8) && (systemTime.minute >= 53) && (systemTime.minute < 8)))
+		((actualHour ==  8) && (systemTime.minute >= 53) && (systemTime.minute < 8)))
 		{
-				actualMatrix[0].high	= 0b00000000;
-				actualMatrix[0].low		= 0b00000000;
-				actualMatrix[1].high	= WORD_ROW01_ZEID_H;
-				actualMatrix[1].low		= WORD_ROW01_ZEID_L;
-				actualMatrix[2].high	= WORD_ROW02_ZEID_H;
-				actualMatrix[2].low		= WORD_ROW02_ZEID_L;
-				actualMatrix[3].high	= WORD_ROW03_ZEID_H;
-				actualMatrix[3].low		= WORD_ROW03_ZEID_L;
-				actualMatrix[4].high	= WORD_ROW04_ZEID_H | WORD_ROW04_ZUM_H;
-				actualMatrix[4].low		= WORD_ROW04_ZEID_L | WORD_ROW04_ZUM_L;	
-				actualMatrix[5].high	= 0b00000000;
-				actualMatrix[5].low		= 0b00000000;
-				actualMatrix[6].high	= WORD_ROW06_FIEDAN_H;
-				actualMatrix[6].low		= WORD_ROW06_FIEDAN_L;
-				actualMatrix[7].high	= WORD_ROW07_FIEDAN_H;
-				actualMatrix[7].low		= WORD_ROW07_FIEDAN_L;
-				actualMatrix[8].high	= WORD_ROW08_FIEDAN_H;
-				actualMatrix[8].low		= WORD_ROW08_FIEDAN_L;
-				actualMatrix[9].high	= WORD_ROW09_FIEDAN_H;
-				actualMatrix[9].low		= WORD_ROW09_FIEDAN_L;
-				actualMatrix[10].high	= WORD_ROW10_FIEDAN_H;
-				actualMatrix[10].low	= WORD_ROW10_FIEDAN_L;
-				actualMatrix[11].high	= WORD_ROW11_FIEDAN_H;
-				actualMatrix[11].low	= WORD_ROW11_FIEDAN_L;
+			actualMatrix[0].high	= 0b00000000;
+			actualMatrix[0].low		= 0b00000000;
+			actualMatrix[1].high	= WORD_ROW01_ZEID_H;
+			actualMatrix[1].low		= WORD_ROW01_ZEID_L;
+			actualMatrix[2].high	= WORD_ROW02_ZEID_H;
+			actualMatrix[2].low		= WORD_ROW02_ZEID_L;
+			actualMatrix[3].high	= WORD_ROW03_ZEID_H;
+			actualMatrix[3].low		= WORD_ROW03_ZEID_L;
+			actualMatrix[4].high	= WORD_ROW04_ZEID_H | WORD_ROW04_ZUM_H;
+			actualMatrix[4].low		= WORD_ROW04_ZEID_L | WORD_ROW04_ZUM_L;
+			actualMatrix[5].high	= 0b00000000;
+			actualMatrix[5].low		= 0b00000000;
+			actualMatrix[6].high	= WORD_ROW06_FIEDAN_H;
+			actualMatrix[6].low		= WORD_ROW06_FIEDAN_L;
+			actualMatrix[7].high	= WORD_ROW07_FIEDAN_H;
+			actualMatrix[7].low		= WORD_ROW07_FIEDAN_L;
+			actualMatrix[8].high	= WORD_ROW08_FIEDAN_H;
+			actualMatrix[8].low		= WORD_ROW08_FIEDAN_L;
+			actualMatrix[9].high	= WORD_ROW09_FIEDAN_H;
+			actualMatrix[9].low		= WORD_ROW09_FIEDAN_L;
+			actualMatrix[10].high	= WORD_ROW10_FIEDAN_H;
+			actualMatrix[10].low	= WORD_ROW10_FIEDAN_L;
+			actualMatrix[11].high	= WORD_ROW11_FIEDAN_H;
+			actualMatrix[11].low	= WORD_ROW11_FIEDAN_L;
 		}
-		
+			
 		// birthday time
-		if ((systemTime.day == 1 && systemTime.month == 1) ||
-			(systemTime.day == 16 && systemTime.month == 1))
+		if (((systemTime.day == 1 && systemTime.month == 1) ||
+		(systemTime.day == 16 && systemTime.month == 1) ||
+		(systemTime.day == 7 && systemTime.month == 8) ||
+		(systemTime.day == 22 && systemTime.month == 9) ||
+		(systemTime.day == 8 && systemTime.month == 12)) &&
+		(((actualHour ==  0) && (systemTime.minute >= 0) && (systemTime.minute < 8)) ||
+		((actualHour ==  6) && (systemTime.minute >= 53) && (systemTime.minute < 8)) ||
+		((actualHour ==  7) && (systemTime.minute >= 53) && (systemTime.minute < 8)) ||
+		((actualHour ==  11) && (systemTime.minute >= 53) && (systemTime.minute < 8)) ||
+		((actualHour ==  23) && (systemTime.minute >= 53) && (systemTime.minute < 59))))
 		{
 			actualMatrix[0].high	= WORD_ROW00_GEBODSDAG_H;
 			actualMatrix[0].low		= WORD_ROW00_GEBODSDAG_L;
@@ -719,12 +732,325 @@ void actualizeMatrixWithSystemTime()
 			actualMatrix[11].high	= 0b00000000;
 			actualMatrix[11].low	= 0b00000000;
 		}
+	}
 }
 
-// actualize 'actualMatrix' Register with manual time
-void actualizeMatrixWithManualTime()
+// actualize 'actualMatrix' Register with squares or night rider dots
+void actualizeMatrixWithSearchingSequence()
+{
+	uint8_t i = 0;
+	static uint8_t state = 0;
+	// check searching mode: square (0) or dots only (1)
+	// searching mode: dots only (1)
+	if(systemConfig.displaySetting & 0x80)
+	{
+		// set matrix dark
+		setMatrixDark();
+		// display dot session
+		switch(state)
+		{
+			case 0:
+			// first dot
+			acutalDot = 0b00010000;
+			break;
+			case 1:
+			// second dot
+			acutalDot = 0b00001000;
+			break;
+			case 2:
+			// third dot
+			acutalDot = 0b00000100;
+			break;
+			case 3:
+			// forth dot
+			acutalDot = 0b00000010;
+			break;
+			case 4:
+			// third dot
+			acutalDot = 0b00000100;
+			break;
+			case 5:
+			// second dot
+			acutalDot = 0b00001000;
+			break;
+			default:
+			// no dot
+			acutalDot = 0b00000000;
+			break;		
+		}
+			
+		// increment state
+		state++;
+		// reset state
+		if (state == 6)
+		{
+			state = 0;
+		}
+	}
+		
+	// searching mode: square (0)
+	else
+	{	
+		// display square session
+		switch(state)
+		{
+			case 0:
+			// first square
+			actualMatrix[0].high	= 0b11111111;
+			actualMatrix[0].low		= 0b11110000;
+			actualMatrix[11].high	= 0b11111111;
+			actualMatrix[11].low	= 0b11110000;
+			for(i = 1; i<11; i++)
+			{
+				actualMatrix[i].high = 0b10000000;
+				actualMatrix[i].low	 = 0b00010000;
+			}
+			acutalDot = 0b00010010;
+			break;
+			case 1:
+			// second square
+			actualMatrix[0].high	= 0b00000000;
+			actualMatrix[0].low		= 0b00000000;
+			actualMatrix[11].high	= 0b00000000;
+			actualMatrix[11].low	= 0b00000000;
+			actualMatrix[1].high	= 0b01111111;
+			actualMatrix[1].low		= 0b11100000;
+			actualMatrix[10].high	= 0b01111111;
+			actualMatrix[10].low	= 0b11100000;
+			for(i = 2; i<10; i++)
+			{
+				actualMatrix[i].high = 0b01000000;
+				actualMatrix[i].low	 = 0b00100000;
+			}
+			acutalDot = 0b00001100;
+			break;
+			case 2:
+			// third square
+			actualMatrix[0].high	= 0b00000000;
+			actualMatrix[0].low		= 0b00000000;
+			actualMatrix[1].high	= 0b00000000;
+			actualMatrix[1].low		= 0b00000000;
+			actualMatrix[10].high	= 0b00000000;
+			actualMatrix[10].low	= 0b00000000;
+			actualMatrix[11].high	= 0b00000000;
+			actualMatrix[11].low	= 0b00000000;
+			actualMatrix[2].high	= 0b00111111;
+			actualMatrix[2].low		= 0b11000000;
+			actualMatrix[9].high	= 0b00111111;
+			actualMatrix[9].low		= 0b11000000;
+			for(i = 3; i<9; i++)
+			{
+				actualMatrix[i].high = 0b00100000;
+				actualMatrix[i].low	 = 0b01000000;
+			}
+			acutalDot = 0b00010010;
+			break;
+			case 3:
+			// fourth square
+			actualMatrix[0].high	= 0b00000000;
+			actualMatrix[0].low		= 0b00000000;
+			actualMatrix[1].high	= 0b00000000;
+			actualMatrix[1].low		= 0b00000000;
+			actualMatrix[2].high	= 0b00000000;
+			actualMatrix[2].low		= 0b00000000;
+			actualMatrix[9].high	= 0b00000000;
+			actualMatrix[9].low		= 0b00000000;
+			actualMatrix[10].high	= 0b00000000;
+			actualMatrix[10].low	= 0b00000000;
+			actualMatrix[11].high	= 0b00000000;
+			actualMatrix[11].low	= 0b00000000;
+			actualMatrix[3].high	= 0b00011111;
+			actualMatrix[3].low		= 0b10000000;
+			actualMatrix[8].high	= 0b00011111;
+			actualMatrix[8].low		= 0b10000000;
+			for(i = 4; i<8; i++)
+			{
+				actualMatrix[i].high = 0b00010000;
+				actualMatrix[i].low	 = 0b10000000;
+			}
+			acutalDot = 0b00001100;
+			break;
+			case 4:
+			// finfth square
+			actualMatrix[0].high	= 0b00000000;
+			actualMatrix[0].low		= 0b00000000;
+			actualMatrix[1].high	= 0b00000000;
+			actualMatrix[1].low		= 0b00000000;
+			actualMatrix[2].high	= 0b00000000;
+			actualMatrix[2].low		= 0b00000000;
+			actualMatrix[3].high	= 0b00000000;
+			actualMatrix[3].low		= 0b00000000;
+			actualMatrix[8].high	= 0b00000000;
+			actualMatrix[8].low		= 0b00000000;
+			actualMatrix[9].high	= 0b00000000;
+			actualMatrix[9].low		= 0b00000000;
+			actualMatrix[10].high	= 0b00000000;
+			actualMatrix[10].low	= 0b00000000;
+			actualMatrix[11].high	= 0b00000000;
+			actualMatrix[11].low	= 0b00000000;
+			actualMatrix[4].high	= 0b00001111;
+			actualMatrix[4].low		= 0b00000000;
+			actualMatrix[7].high	= 0b00001111;
+			actualMatrix[7].low		= 0b00000000;
+			for(i = 5; i<7; i++)
+			{
+				actualMatrix[i].high = 0b00001001;
+				actualMatrix[i].low	 = 0b0000000;
+			}
+			acutalDot = 0b00010010;
+			break;
+			case 5:
+			// sixth square
+			actualMatrix[0].high	= 0b00000000;
+			actualMatrix[0].low		= 0b00000000;
+			actualMatrix[1].high	= 0b00000000;
+			actualMatrix[1].low		= 0b00000000;
+			actualMatrix[2].high	= 0b00000000;
+			actualMatrix[2].low		= 0b00000000;
+			actualMatrix[3].high	= 0b00000000;
+			actualMatrix[3].low		= 0b00000000;
+			actualMatrix[4].high	= 0b00000000;
+			actualMatrix[4].low		= 0b00000000;
+			actualMatrix[7].high	= 0b00000000;
+			actualMatrix[7].low		= 0b00000000;
+			actualMatrix[8].high	= 0b00000000;
+			actualMatrix[8].low		= 0b00000000;
+			actualMatrix[9].high	= 0b00000000;
+			actualMatrix[9].low		= 0b00000000;
+			actualMatrix[10].high	= 0b00000000;
+			actualMatrix[10].low	= 0b00000000;
+			actualMatrix[11].high	= 0b00000000;
+			actualMatrix[11].low	= 0b00000000;
+			actualMatrix[5].high	= 0b00000110;
+			actualMatrix[5].low		= 0b00000000;
+			actualMatrix[6].high	= 0b00000110;
+			actualMatrix[6].low		= 0b00000000;
+			acutalDot = 0b00001100;
+			break;
+			case 6:
+			// finfth square
+			actualMatrix[0].high	= 0b00000000;
+			actualMatrix[0].low		= 0b00000000;
+			actualMatrix[1].high	= 0b00000000;
+			actualMatrix[1].low		= 0b00000000;
+			actualMatrix[2].high	= 0b00000000;
+			actualMatrix[2].low		= 0b00000000;
+			actualMatrix[3].high	= 0b00000000;
+			actualMatrix[3].low		= 0b00000000;
+			actualMatrix[8].high	= 0b00000000;
+			actualMatrix[8].low		= 0b00000000;
+			actualMatrix[9].high	= 0b00000000;
+			actualMatrix[9].low		= 0b00000000;
+			actualMatrix[10].high	= 0b00000000;
+			actualMatrix[10].low	= 0b00000000;
+			actualMatrix[11].high	= 0b00000000;
+			actualMatrix[11].low	= 0b00000000;
+			actualMatrix[4].high	= 0b00001111;
+			actualMatrix[4].low		= 0b00000000;
+			actualMatrix[7].high	= 0b00001111;
+			actualMatrix[7].low		= 0b00000000;
+			for(i = 5; i<7; i++)
+			{
+				actualMatrix[i].high = 0b00001001;
+				actualMatrix[i].low	 = 0b0000000;
+			}
+			acutalDot = 0b00010010;
+			break;
+			case 7:
+			// fourth square
+			actualMatrix[0].high	= 0b00000000;
+			actualMatrix[0].low		= 0b00000000;
+			actualMatrix[1].high	= 0b00000000;
+			actualMatrix[1].low		= 0b00000000;
+			actualMatrix[2].high	= 0b00000000;
+			actualMatrix[2].low		= 0b00000000;
+			actualMatrix[9].high	= 0b00000000;
+			actualMatrix[9].low		= 0b00000000;
+			actualMatrix[10].high	= 0b00000000;
+			actualMatrix[10].low	= 0b00000000;
+			actualMatrix[11].high	= 0b00000000;
+			actualMatrix[11].low	= 0b00000000;
+			actualMatrix[3].high	= 0b00011111;
+			actualMatrix[3].low		= 0b10000000;
+			actualMatrix[8].high	= 0b00011111;
+			actualMatrix[8].low		= 0b10000000;
+			for(i = 4; i<8; i++)
+			{
+				actualMatrix[i].high = 0b00010000;
+				actualMatrix[i].low	 = 0b10000000;
+			}
+			acutalDot = 0b00001100;
+			break;
+			case 8:
+			// third square
+			actualMatrix[0].high	= 0b00000000;
+			actualMatrix[0].low		= 0b00000000;
+			actualMatrix[1].high	= 0b00000000;
+			actualMatrix[1].low		= 0b00000000;
+			actualMatrix[10].high	= 0b00000000;
+			actualMatrix[10].low	= 0b00000000;
+			actualMatrix[11].high	= 0b00000000;
+			actualMatrix[11].low	= 0b00000000;
+			actualMatrix[2].high	= 0b00111111;
+			actualMatrix[2].low		= 0b11000000;
+			actualMatrix[9].high	= 0b00111111;
+			actualMatrix[9].low		= 0b11000000;
+			for(i = 3; i<9; i++)
+			{
+				actualMatrix[i].high = 0b00100000;
+				actualMatrix[i].low	 = 0b01000000;
+			}
+			acutalDot = 0b00010010;
+			break;
+			case 9:
+			// second square
+			actualMatrix[0].high	= 0b00000000;
+			actualMatrix[0].low		= 0b00000000;
+			actualMatrix[11].high	= 0b00000000;
+			actualMatrix[11].low	= 0b00000000;
+			actualMatrix[1].high	= 0b01111111;
+			actualMatrix[1].low		= 0b11100000;
+			actualMatrix[10].high	= 0b01111111;
+			actualMatrix[10].low	= 0b11100000;
+			for(i = 2; i<10; i++)
+			{
+				actualMatrix[i].high = 0b01000000;
+				actualMatrix[i].low	 = 0b00100000;
+			}
+			acutalDot = 0b00001100;
+			break;
+			default:
+			// set matrix dark
+			setMatrixDark();
+			// no dot
+			acutalDot = 0b00000000;
+			break;
+		}
+
+		// increment state
+		state++;
+		// reset state
+		if (state == 10)
+		{
+			state = 0;
+		}
+	}
+}
+
+// actualize 'actualMatrix' Register with in menu mode
+void actualizeMatrixInMenuMode()
 {
 		// binary date time
+		actualMatrix[0].high	= systemConfig.version;
+		actualMatrix[0].low		= 0;
+		actualMatrix[1].high	= 0;
+		actualMatrix[1].low		= 0;
+		actualMatrix[2].high	= 0;
+		actualMatrix[2].low		= 0;
+		actualMatrix[3].high	= 0;
+		actualMatrix[3].low		= 0;
+		actualMatrix[4].high	= 0;
+		actualMatrix[4].low		= 0;	
 		actualMatrix[5].high	= systemTime.hour;
 		actualMatrix[5].low		= 0;
 		actualMatrix[6].high	= systemTime.minute;
@@ -739,10 +1065,4 @@ void actualizeMatrixWithManualTime()
 		actualMatrix[10].low	= 0;
 		actualMatrix[11].high	= systemTime.weekday;
 		actualMatrix[11].low	= 0;
-}
-
-// actualize 'actualMatrix' or dots with Register with manual time
-void searchingSeaquence()
-{
-	
 }

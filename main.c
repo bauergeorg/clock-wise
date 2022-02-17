@@ -72,14 +72,14 @@ int main(void)
 //	uint8_t i = 0;
 	
 	// init functions
-	initSystem();
-	initGpios();
-	initTimeMgnt();
-//	initRtc();
-	initAdc();
-	initMatrix();	
-	initDcf77();
-	initTasks();
+	initSystem();		// global settings
+	initGpios();		// external interrupts via switches
+	initTimeMgnt();		// timer 1 for time management
+	initRtc();			// rtc communication
+	initAdc();			// adcs for brightness and
+	initMatrix();		// matrix management
+	initDcf77();		// dcf77 management
+	initTasks();		// task management
 
 	// read light intensity value of adc
 	systemConfig.lightIntensity = calculateIntensity(adcRead(0));
@@ -91,12 +91,36 @@ int main(void)
 	// enable global interrupt
 	sei();
 	
-	// start receiving
-	startDcf77Signal();
-		
+	// test
+	switchOffStatusYellow();
+	switchOffStatusRed();
+
+	// check for data from rtc
+	// if the rtc communication is failed 
+	if(~getTimeFromRtc())
+	{
+		// start receiving
+		startDcf77Signal();
+		// set default system status
+		// - xxxx.xx1xb searching dcf77 signal active
+		systemConfig.status |= 0x02;
+		// - xxxx.xxx0b no time value available
+		// - xxxx.x0xxb rtc time is not available
+		systemConfig.status &= ~0x05;
+	}
+	else
+	{
+		// set default system status
+		// - xxxx.xxx1b time information in system available
+		// - xxxx.x1xxb rtc time is available
+		systemConfig.status |= 0x05;
+		// - xxxx.xx0xb searching dcf77 signal inactive
+		systemConfig.status &= ~0x2;
+	}
+
 	// endless loop
     while (1) 					
-   {
+	{
 		// when do nothing
 		checkForTask();
     }	

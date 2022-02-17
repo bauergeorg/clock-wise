@@ -11,8 +11,8 @@
 *******************************************************************************
 *
 * Status LED:
-* - On boot up the yellow led is switched onthe led starts blinking
-*	(on time 0,1s or 0,2s every scond), when signals is receiving
+* - On boot up the yellow led is switched on the led starts blinking
+*	(on time 0,1s or 0,2s every second), when signals is receiving
 * - The red LED switches off, if time value was decode correctly
 *
 *******************************************************************************
@@ -58,6 +58,7 @@ extern volatile struct systemParameter systemConfig;
 //! Initialize dcf77
 void initDcf77(void)
 {
+	/*
 	//! external interrupt for signal of dcf 77 receiver
 	// enabled external pin change interrupts PCINT23:16 
 	PCICR |= 1 << PCIE2;
@@ -65,6 +66,7 @@ void initDcf77(void)
 	PCMSK2 |= 1 << PCINT22;
 	// delete flag for interrupts PCINT23:16 
 	PCIFR |= 1 << PCIF2;
+	*/
 	
 	//! timer for decoding dcf77 signal
 	// 8 bit timer/counter 0
@@ -78,9 +80,9 @@ void initDcf77(void)
 	// disable when pc7 high
 	// activate PC7 as output
 	DDRC |= (1 << PC7);
-	// switch PC7 on
+	// switch PC7 high
 	PORTC |= (1 << PC7);
-		
+			
 	//! port settings for input signal of dcf77 receiver
 	// activate PC6 as input
 	DDRC &= ~(1 << PC6);
@@ -186,7 +188,7 @@ void decodeDcf77(void)
 		}
 	}
 	else {
-		// minute parity bit okey?
+		// minute parity bit okay?
 		if (!(parity % 2))//parity == 0 || parity == 2 || parity == 4 || parity == 6)
 		{
 			parity = 0;
@@ -234,7 +236,7 @@ void decodeDcf77(void)
 	
 	if (dcfArray[35] == 1)
 	{	
-		// hour parity bit okey?
+		// hour parity bit okay?
 		if (parity % 2)//parity == 1 || parity == 3 || parity == 5)
 		{
 			parity = 0;
@@ -246,7 +248,7 @@ void decodeDcf77(void)
 	}
 	else
 	{						
-		// hour parity bit okey?
+		// hour parity bit okay?
 		if (!(parity % 2))//parity == 0 || parity == 2 || parity == 4 || parity == 6)
 		{
 			parity = 0;
@@ -423,14 +425,11 @@ void decodeDcf77(void)
 		systemTime.month = month;
 		systemTime.year = year;
 		systemTime.weekday = weekday;
-		
-		// time information in system available - a time will displayed
-		systemConfig.status |= 0x01;
-		
+			
 		stopDcf77Signal();
 	}
 	
-	// save acutal time values for next decode session
+	// save actual time values for next decode session
 	minuteOld = minute;
 	hourOld = hour;
 }
@@ -438,14 +437,45 @@ void decodeDcf77(void)
 //! activate dcf77 signal
 void startDcf77Signal(void)
 {
+
+	//! external interrupt for signal of dcf 77 receiver
+	// enabled external pin change interrupts PCINT23:16
+	PCICR |= 1 << PCIE2;
+	// activate PC2 (PCINT22) as external interrupt
+	PCMSK2 |= 1 << PCINT22;
+	// delete flag for interrupts PCINT23:16
+	PCIFR |= 1 << PCIF2;
+	
+	// set default system status
+	// - xxxx.xx1xb searching dcf77 signal active
+	systemConfig.status |= 0x02;
+
 	// enable when pc7 low
-	// switch PC7 on
+	// switch PC7 low
 	PORTC &= ~(1 << PC7);
+	
+	// test
+	switchOnStatusRed();
 }
 
-//! activate dcf77 signal
+//! deactivate dcf77 signal
 void stopDcf77Signal(void)
 {
+
+	//! external interrupt for signal of dcf 77 receiver
+	// disabled external pin change interrupts PCINT23:16
+	PCICR &= ~(1 << PCIE2);
+	// inactivate PC2 (PCINT22) as external interrupt
+	PCMSK2 &= ~(1 << PCINT22);
+	// delete flag for interrupts PCINT23:16
+	PCIFR |= 1 << PCIF2;
+	
+	// set default system status
+	// - xxxx.xxx1b time information in system available
+	systemConfig.status |= 0x01;
+	// - xxxx.xx0xb searching dcf77 signal inactive
+	systemConfig.status &= ~0x02;
+	
 	// disable when pc7 high
 	// switch PC7 on
 	PORTC |= (1 << PC7);
@@ -454,7 +484,6 @@ void stopDcf77Signal(void)
 //! Interrupt Service Routine for when DCF77 signal changes
 ISR(PCINT2_vect)			// start signal 0,1s or 0,2s 
 {
-
 	// reset of timer 0
 	TCNT0 = 0;						
 	// set dcf77 receive flag 
@@ -462,9 +491,6 @@ ISR(PCINT2_vect)			// start signal 0,1s or 0,2s
 	
 	// set status led yellow
 	switchOnStatusYellow();
-	
-	// searching for dcf77-signal is active
-	//systemConfig.status |= 0x02;
 	
 	// deactivate external interrupt, if signal is complete, interrupt will be activated
 	PCMSK2 &= ~(1 << PCINT22);

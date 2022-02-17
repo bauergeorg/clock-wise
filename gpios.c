@@ -34,6 +34,7 @@
 
 //! Libraries
 #include "gpios.h"
+#include "system.h"
 
 /*
 // Own global variables
@@ -44,6 +45,9 @@ volatile uint8_t updown = 1; // up = 1, down = 0
 // definition of the pause
 const double DELAY = 100;  // 10µs
 */
+
+//! Extern global variables
+extern volatile struct systemParameter systemConfig;
 
 //! Initialize input and output ports
 void initGpios(void)
@@ -82,11 +86,19 @@ ISR(PCINT0_vect)
 	switches = (PINA & 0x3C) >> 2;
 	if((switches & 0x08) && ((switches & 0x01)))
 	{
+		// set default system status
+		// - xxxx.1xxxb setting menu is active
+		systemConfig.status |= 0x04;
+		
 		// test
 		switchOnStatusRed();
 	}
-	else
+	if(switches == 0x01)
 	{
+		// set default system status
+		// - xxxx.0xxxb setting menu is active
+		systemConfig.status &= ~0x04;
+		
 		// test
 		switchOffStatusRed();
 	}

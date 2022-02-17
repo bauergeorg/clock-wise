@@ -16,16 +16,19 @@
 #include "settings.h"
 
 //! Own global variables
-struct systemParameter systemConfig;
-struct time systemTime;
+volatile struct systemParameter systemConfig;
+volatile struct time systemTime;
 
 //! Write Initial values
 void initSystem(void)
 {
 	// set default system status
 	// - xxxx.xxx0b no time value available
-	// - xxxx.xx1xb searching dcf77 signal
-	systemConfig.status =  0x02;
+	// - xxxx.xx0xb searching dcf77 signal inactive
+	// - xxxx.x0xxb rtc time is not available
+	// - xxxx.0xxxb setting menu is inactive
+	// - xxx1.xxxxb automatic time mode is active
+	systemConfig.status = 0x10;
 	// default light intensity
 	systemConfig.lightIntensity = 10;
 	// set value of potentiometer 		
@@ -35,19 +38,23 @@ void initSystem(void)
 	// set default system display settings
 	// - xxxx.xxx0b straight pie
 	// - xxxx.000xb original without birthday and horses@6pm
-	// - x1xx.xxxxb automatic display brightness regulation is active
+	// - x0xx.xxxxb automatic display brightness regulation is inactive
 	// - 1xxx.xxxxb only dot sequence when searching signal
-	systemConfig.displaySetting = 0xC0; // see above
-
+	systemConfig.displaySetting = 0x80; // see above
+	// set menu state to default
+	systemConfig.menuState = 0;
+	// system version 0.0.1
+	systemConfig.version = 1;
+	
 	// set init time values
 	// (wedding day from dad and mom) 
 	systemTime.year		= 16;
 	systemTime.month	= 1;
-	systemTime.day		= 1;
-	systemTime.hour		= 0;
+	systemTime.day		= 4;
+	systemTime.hour		= 11;
 	systemTime.minute	= 0;
 	systemTime.second	= 0;
-	systemTime.weekday	= 0;
+	systemTime.weekday	= 1;
 }
 
 uint8_t calcuateBrightness(uint8_t lightIntensity, uint8_t potentiometerValue)
@@ -58,7 +65,7 @@ uint8_t calcuateBrightness(uint8_t lightIntensity, uint8_t potentiometerValue)
 	// (bit 6):	shows automatic display brightness variant
 	// 0b automatic display brightness regulation is inactive
 	// 1b automatic display brightness regulation is active
-	if(systemConfig.displaySetting & 0b01000000)
+	if(systemConfig.displaySetting & 0x40)
 	{
 		// mean value
 		brightness = (lightIntensity >> 1) + (potentiometerValue >> 1);
