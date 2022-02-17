@@ -12,7 +12,7 @@
 *
 * Matrix is divided into 12 rows from 0 (first - top) to 11 (last - bottom) and
 * into 12 columns from 0 (first - left) to 11 (last - right).
-* Every row information is dividet into two bytes
+* Every row information is divided into two bytes
 *	uint8_t high;	// information from 1st (left) to 8th led
 *	uint8_t low;	// information from 9th to 12th led last (right)
 * The last 4 bits of low byte are empty. If these bits are not empty, the led
@@ -742,18 +742,19 @@ void actualizeMatrixWithSystemTime()
 	}
 }
 
-// actualize 'actualMatrix' Register with squares or night rider dots
+// actualize 'actualMatrix' Register with squares or no sequence
 void actualizeMatrixWithSearchingSequence()
 {
 	uint8_t i = 0;
 	static uint8_t state = 0;
-	// check searching mode: square (0) or dots only (1)
-	// searching mode: dots only (1)
+	// check searching mode: square (0) or no sequence (1)
+	// searching mode: no sequence (1)
 	if(systemConfig.displaySetting & 0x80)
 	{
 		// set matrix dark
 		setMatrixDark();
 		
+		// no sequence
 		acutalDot = 0b00000000;
 		/*// display dot session
 		switch(state)
@@ -1066,7 +1067,7 @@ void actualizeMatrixInMenuMode(void)
 		// show version
 		case DISPLAY_STATE_MENU_VERSION:
 		{
-			// display a VER lbr 001			
+			// display a VER lbr 002			
 			actualMatrix[0].high	= 0xAE;
 			actualMatrix[0].low		= 0xC0;
 			actualMatrix[1].high	= 0xA8;
@@ -1080,15 +1081,15 @@ void actualizeMatrixInMenuMode(void)
 			actualMatrix[5].high	= 0;
 			actualMatrix[5].low		= 0;
 			actualMatrix[6].high	= 0xEE;
-			actualMatrix[6].low		= 0x20;
+			actualMatrix[6].low		= 0xE0;
 			actualMatrix[7].high	= 0xAA;
-			actualMatrix[7].low		= 0x60;
+			actualMatrix[7].low		= 0x20;
 			actualMatrix[8].high	= 0xAA;
-			actualMatrix[8].low		= 0xA0;
+			actualMatrix[8].low		= 0xE0;
 			actualMatrix[9].high	= 0xAA;
-			actualMatrix[9].low		= 0x20;
+			actualMatrix[9].low		= 0x80;
 			actualMatrix[10].high	= 0xEE;
-			actualMatrix[10].low	= 0x20;
+			actualMatrix[10].low	= 0xE0;
 			actualMatrix[11].high	= 0x00;
 			actualMatrix[11].low	= 0x00;
 			break;
@@ -2365,10 +2366,10 @@ void actualizeMatrixInMenuMode(void)
 				break;
 			}
 			
-			// display settings: searching sequence dots
-			case DISPLAY_STATE_MENU_SEARCH_DOT:
+			// display settings: no searching sequence
+			case DISPLAY_STATE_MENU_SEARCH_NO:
 			{
-				// display char SER lbr DOT
+				// display char SER lbr NO
 				actualMatrix[0].high	= 0xEE;
 				actualMatrix[0].low		= 0xC0;
 				actualMatrix[1].high	= 0x88;
@@ -2381,16 +2382,16 @@ void actualizeMatrixInMenuMode(void)
 				actualMatrix[4].low		= 0xA0;
 				actualMatrix[5].high	= 0;
 				actualMatrix[5].low		= 0;
-				actualMatrix[6].high	= 0xCE;
-				actualMatrix[6].low		= 0xE0;
-				actualMatrix[7].high	= 0xAA;
-				actualMatrix[7].low		= 0x40;
+				actualMatrix[6].high	= 0x8B;
+				actualMatrix[6].low		= 0x80;
+				actualMatrix[7].high	= 0xCA;
+				actualMatrix[7].low		= 0x80;
 				actualMatrix[8].high	= 0xAA;
-				actualMatrix[8].low		= 0x40;
-				actualMatrix[9].high	= 0xAA;
-				actualMatrix[9].low		= 0x40;
-				actualMatrix[10].high	= 0xCE;
-				actualMatrix[10].low	= 0x40;
+				actualMatrix[8].low		= 0x80;
+				actualMatrix[9].high	= 0x9A;
+				actualMatrix[9].low		= 0x80;
+				actualMatrix[10].high	= 0x8B;
+				actualMatrix[10].low	= 0x80;
 				actualMatrix[11].high	= 0;
 				actualMatrix[11].low	= 0;
 				break;

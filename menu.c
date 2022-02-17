@@ -945,8 +945,8 @@ void menuMgnt(uint8_t switches)
 				// ok switch is pressed
 				if(okSwitch)
 				{
-					// set new display status: searching sequence dots
-					systemConfig.displayStatus = DISPLAY_STATE_MENU_SEARCH_DOT;
+					// set new display status: no searching sequence
+					systemConfig.displayStatus = DISPLAY_STATE_MENU_SEARCH_NO;
 				}
 				// up switch is pressed
 				if(upSwitch)
@@ -969,14 +969,14 @@ void menuMgnt(uint8_t switches)
 				break;
 			}	
 			
-				// display settings: searching sequence dots
-				case DISPLAY_STATE_MENU_SEARCH_DOT:
+				// display settings: no searching sequence
+				case DISPLAY_STATE_MENU_SEARCH_NO:
 				{
 					// ok switch is pressed
 					if(okSwitch)
 					{
 						// set system display settings
-						// - 1xxx.xxxxb set's the display sequence while time searching mode - dots
+						// - 1xxx.xxxxb set's the display sequence while time searching mode - no sequence
 						systemConfig.displaySetting |= 0x80; // see above
 						// set new display status: display settings searching sequence
 						systemConfig.displayStatus = DISPLAY_STATE_MENU_SEARCH_MODE;
@@ -1011,8 +1011,8 @@ void menuMgnt(uint8_t switches)
 					// up or down switch is pressed
 					if(upSwitch || downSwitch)
 					{
-						// set new display status: searching sequence dots
-						systemConfig.displayStatus = DISPLAY_STATE_MENU_SEARCH_DOT;
+						// set new display status: no searching sequence
+						systemConfig.displayStatus = DISPLAY_STATE_MENU_SEARCH_NO;
 					}
 					// cancel switch is pressed
 					if(cancelSwitch)

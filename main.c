@@ -94,7 +94,19 @@ int main(void)
 	// switsch off test leds
 	switchOffStatusYellow();
 	switchOffStatusRed();
+	
+	// nur übergangsweise für version v0.0.2
+	// nehme default time und suche nicht automatishc im boot-up
+	
+	// set default system status
+	// - xxxx.xxx1b time value available
+	// - xxxx.xx0xb searching dcf77 signal inactive
+	// - xxxx.x0xxb rtc time is not available
+	// - xxxx.0xxxb setting menu is inactive
+	// - xxx0.xxxxb automatic time mode is active
+	systemConfig.status = 0x01;
 
+/*
 	// check for data from rtc
 	// if the rtc communication is failed 
 	if(~getTimeFromRtc())
@@ -119,7 +131,7 @@ int main(void)
 		// - xxxx.xx0xb searching dcf77 signal inactive
 		systemConfig.status &= ~0x02;
 	}
-
+*/
 	// endless loop
     while (1) 					
 	{

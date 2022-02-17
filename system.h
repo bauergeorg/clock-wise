@@ -78,7 +78,7 @@
 *	232d			- brihtday and horse mode
 *	240d		- searching sequence mode
 *	241d			- square
-*	242d			- dots only
+*	242d			- no sequence
 *	250d	- debug Mode
 *	251d		- debug Mode 1
 *	252d		- debug Mode 2
@@ -106,7 +106,7 @@
 * 
 *	vb (bit 7): set's the display sequence while time searching mode
 *	0b square & dot sequence when searching signal
-*	1b only dot sequence when searching signal
+*	1b no sequence when searching signal
 *
 *******************************************************************************
 */
@@ -190,7 +190,7 @@ uint8_t calculatePotiValue(uint8_t potiValue);
 #define DISPLAY_STATE_MENU_CHAR_BIRTHDAY	232	// 			- brithday and horse mode
 #define DISPLAY_STATE_MENU_SEARCH_MODE		240	// 		- searching sequence mode
 #define DISPLAY_STATE_MENU_SEARCH_SQUARE	241	// 			- square
-#define DISPLAY_STATE_MENU_SEARCH_DOT		242	// 			- dots only
+#define DISPLAY_STATE_MENU_SEARCH_NO		242	// 			- no sequence
 #define DISPLAY_STATE_MENU_DBG				250 // - debug Mode
 #define DISPLAY_STATE_MENU_DBG1				251 //		- debug Mode 1
 #define DISPLAY_STATE_MENU_DBG2				252 //		- debug Mode 2

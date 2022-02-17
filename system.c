@@ -39,22 +39,22 @@ void initSystem(void)
 	// - xxxx.xxx0b straight pie
 	// - xxxx.001xb original with birthday and horses@6pm
 	// - x1xx.xxxxb automatic display brightness regulation is active
-	// - 1xxx.xxxxb only dot sequence when searching signal
+	// - 1xxx.xxxxb no sequence when searching signal
 	systemConfig.displaySetting = 0xC2; // see above
 	// set display status to dark
 	systemConfig.displayStatus = DISPLAY_STATE_DARK;
-	// system version 0.0.1
-	systemConfig.version = 1;
+	// system version 0.0.2
+	systemConfig.version = 2;
 	
 	// set init time values
 	// (wedding day from dad and mom) 
 	systemTime.year		= 16;
-	systemTime.month	= 2;
-	systemTime.day		= 26;
-	systemTime.hour		= 19;
-	systemTime.minute	= 17;
+	systemTime.month	= 12;
+	systemTime.day		= 28;
+	systemTime.hour		= 18;
+	systemTime.minute	= 00;
 	systemTime.second	= 0;
-	systemTime.weekday	= 1;
+	systemTime.weekday	= 3;
 }
 
 uint8_t calcuateBrightness(uint8_t lightIntensity, uint8_t potentiometerValue)
