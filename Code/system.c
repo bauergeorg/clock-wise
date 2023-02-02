@@ -47,7 +47,6 @@ void initSystem(void)
 	systemConfig.version = 3;
 	
 	// set init time values
-	// (wedding day from dad and mom) 
 	systemTime.year		= 18;
 	systemTime.month	= 12;
 	systemTime.day		= 24;

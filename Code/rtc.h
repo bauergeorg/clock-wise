@@ -16,11 +16,13 @@
 #include <stdint.h>
 
 //! function declarations
-void RTC_Clock_Write(char, char, char, char);
-void RTC_Read_Clock(char);
+void RTC_Clock_Write(char, char, char);
+void RTC_Clock_Read(void);
 void RTC_Calendar_Write(char, char, char, char);
-void RTC_Read_Calendar(char);
+void RTC_Calendar_Read(void);
 uint8_t IsItPM(char);
 void initRtc(void);
-uint8_t getTimeFromRtc(void);
-uint8_t setTimeToRtc(char, char, char, char);
+void updateTimeWithRtcValues(void);
+void checkRtcTime(void);
+void getTimeFromRtc(void);
+void setTimeToRtc(char, char, char);

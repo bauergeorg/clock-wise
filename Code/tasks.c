@@ -17,6 +17,7 @@
 #include "system.h"
 #include "gpios.h"
 #include "adc.h"
+#include "rtc.h"
 #include "displayMatrix.h"
 #include "ledMatrix.h"
 
@@ -31,13 +32,13 @@ void taskHour(void)
 	
 }
 
-//! Task hour
+//! Task 13 Minute
 void taskThirteenMinute(void)
 {
 	
 }
 
-//! Task hour
+//! Task 15 minute
 void taskFifteenMinute(void)
 {
 	
@@ -58,7 +59,8 @@ void taskFiveMinute(void)
 //! Task minute
 void taskMinute(void)
 {
-
+	// read data from rtc and set local time
+	//RTC_Clock_Read()
 }
 
 //! Task second

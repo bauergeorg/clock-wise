@@ -100,16 +100,28 @@ int main(void)
 	
 	// set default system status
 	// - xxxx.xxx0b time value not available
-	// - xxxx.xx1xb searching dcf77 signal active
+	// - xxxx.xx0xb searching dcf77 signal active
 	// - xxxx.x0xxb rtc time is not available
 	// - xxxx.0xxxb setting menu is inactive
 	// - xxx0.xxxxb automatic time mode is active
-	systemConfig.status = 0x02;
-	// start receiving
-	startDcf77Signal();
-								
-	// set new display status: show searching mode
-	systemConfig.displayStatus = DISPLAY_STATE_SEARCH;
+	systemConfig.status = 0x00;
+
+	// check if rtc device has valid values (set status)
+	checkRtcTime();
+	// if device has valid values, take this values to display
+	if(systemConfig.status & 0x04)
+	{
+		// update time values (set status)
+		updateTimeWithRtcValues();
+	}
+	// scan dcf 77 signal
+	else
+	{
+		// start receiving
+		startDcf77Signal();					
+		// set new display status: show searching mode
+		systemConfig.displayStatus = DISPLAY_STATE_SEARCH;
+	}
 					
 /*
 	// check for data from rtc

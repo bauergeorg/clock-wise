@@ -21,6 +21,7 @@
 #include "dcf77.h"
 #include "gpios.h"
 #include "displayMatrix.h"
+#include "rtc.h"
 
 //! Own global variables
 volatile struct time setTime;
@@ -631,10 +632,14 @@ void menuMgnt(uint8_t switches)
 					systemTime = setTime;
 					// set system status
 					// - xxxx.xxx1b time information in system available - a time signal is displayed (if no menu is selected)
-					// - xxx1.xxxb manual time mode is active
-					systemConfig.status |= 0x11;
+					// - xxx1.xxxxb manual time mode is active
+					// - xxxx.x1xxb rtc time is active
+					systemConfig.status |= 0x15;
 					// - xxxx.xx0xb searching for dcf77-signal is inactive
 					systemConfig.status &= ~0x02;
+					
+					// set rtc time
+					setTimeToRtc(setTime.hour, setTime.minute, setTime.second);
 					
 					// stop dcf77 signal
 					stopDcf77Signal();
