@@ -29,7 +29,7 @@ extern volatile struct time systemTime;
 extern volatile struct systemParameter systemConfig;
 
 /* function for clock */
-void RTC_Write_Clock(char _hour, char _minute, char _second)
+void RTC_Clock_Write(char _hour, char _minute, char _second)
 {
 	_hour |= AMPM;
 	I2C_Start(Device_Write_address);	/* Start I2C communication with RTC */
@@ -40,7 +40,7 @@ void RTC_Write_Clock(char _hour, char _minute, char _second)
 	I2C_Stop();							/* Stop I2C communication */
 }
 
-void RTC_Read_Clock(void)
+void RTC_Clock_Read(void)
 {
 	I2C_Start(Device_Write_address);			/* Start I2C communication with RTC */
 	I2C_Write(0);								/* Write address to read */
@@ -53,7 +53,7 @@ void RTC_Read_Clock(void)
 }
 
 /* function for calendar */
-void RTC_Write_Calendar(char _day, char _date, char _month, char _year)
+void RTC_Calendar_Write(char _day, char _date, char _month, char _year)
 {
 	I2C_Start(Device_Write_address);	/* Start I2C communication with RTC */
 	I2C_Write(3);						/* Write 3 address for day */
@@ -64,8 +64,7 @@ void RTC_Write_Calendar(char _day, char _date, char _month, char _year)
 	I2C_Stop();							/* Stop I2C communication */
 }
 
-
-void RTC_Read_Calendar(void)
+void RTC_Calendar_Read(void)
 {
 	I2C_Start(Device_Write_address);
 	I2C_Write(3);
@@ -95,7 +94,6 @@ void initRtc()
 	DDRC |= (1 << PC1) | (1 << PC0);
 	// set PC0 and PC1 as high
 	PORTC |= (1 << PC1) | (1 << PC0);
-	
 
 }
 
@@ -103,8 +101,8 @@ void initRtc()
 void checkRtcTime()
 {
 	// read values
-	RTC_Read_Clock();
-	RTC_Read_Calendar();
+	RTC_Clock_Read();
+	RTC_Calendar_Read();
 		
 	// check if rtc time is available
 	if((second == 0) && (minute != 0) && (hour != 0))
@@ -121,12 +119,10 @@ void checkRtcTime()
 	}
 }
 
-
 void updateTimeWithRtcValues(void)
 {
 	// read values
-	RTC_Read_Clock();
-	RTC_Read_Calendar();
+	getTimeFromRtc();
 	
 	systemTime.hour = hour;
 	systemTime.minute = minute;
@@ -142,20 +138,14 @@ void updateTimeWithRtcValues(void)
 //! get time values from real time clock via i2c
 void getTimeFromRtc(void)
 {
-	// return value: if rtc time received sucessful value is true,
-	// if the rtc communication failed the return value is false
-	RTC_Read_Clock();		/* Read clock with second add. i.e location is 0 */
-	RTC_Read_Calendar();	/* Read calendar */
-		
+	RTC_Clock_Read();		/* Read clock with second add. i.e location is 0 */
+	RTC_Calendar_Read();	/* Read calendar */
 }
 
 
 //! set time values from real time clock via i2c
 void setTimeToRtc(char HH, char MM, char SS)
 {
-	// return value: if rtc time set successful value is true,
-	// if the rtc communication failed the return value is false
-	
 	RTC_Clock_Write(HH, MM, SS);
 	//RTC_Calendar_Write(char _day, char _date, char _month, char _year)
 					
