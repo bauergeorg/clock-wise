@@ -47,6 +47,7 @@
 #include "system.h"
 #include "dcf77.h"
 #include "ledMatrix.h"
+#include "i2c.h"
 #include "rtc.h"
 #include "gpios.h"
 #include "timeMgnt.h"
@@ -75,6 +76,7 @@ int main(void)
 	initSystem();		// global settings
 	initGpios();		// external interrupts via switches
 	initTimeMgnt();		// timer 1 for time management
+	I2C_Init();			// i2c communication
 	initRtc();			// rtc communication
 	initAdc();			// adcs for brightness and
 	initMatrix();		// matrix management
@@ -106,8 +108,21 @@ int main(void)
 	// - xxx0.xxxxb automatic time mode is active
 	systemConfig.status = 0x00;
 
+	// ONLY FOR DEBUG!!!!! below!
+	// set rtc time
+	setTimeToRtc(12, 12, 12);
+	// set system status
+	// - xxxx.xxx1b time information in system available - a time signal is displayed (if no menu is selected)
+	// - xxx1.xxxxb manual time mode is active
+	// - xxxx.x1xxb rtc time is active
+	systemConfig.status |= 0x15;
+	// - xxxx.xx0xb searching for dcf77-signal is inactive
+	systemConfig.status &= ~0x02;
+	updateTimeWithRtcValues();
+	// ONLY FOR DEBUG!!!!! above!
+	
 	// check if rtc device has valid values (set status)
-	checkRtcTime();
+	//checkRtcTime();
 	// if device has valid values, take this values to display
 	if(systemConfig.status & 0x04)
 	{
