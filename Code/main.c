@@ -110,7 +110,7 @@ int main(void)
 
 	// ONLY FOR DEBUG!!!!! below!
 	// set rtc time
-	setTimeToRtc(12, 12, 12);
+	setTimeToRtc(3, 3, 3);
 	// set system status
 	// - xxxx.xxx1b time information in system available - a time signal is displayed (if no menu is selected)
 	// - xxx1.xxxxb manual time mode is active
