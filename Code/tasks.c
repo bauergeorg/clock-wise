@@ -60,7 +60,7 @@ void taskFiveMinute(void)
 void taskMinute(void)
 {
 	// read data from rtc and set local time
-	//RTC_Clock_Read()
+	//updateTimeWithRtcValues();
 }
 
 //! Task second

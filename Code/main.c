@@ -96,7 +96,6 @@ int main(void)
 	// switsch off test leds
 	switchOffStatusYellow();
 	switchOffStatusRed();
-	
 	// nur übergangsweise für version v0.0.2
 	// nehme default time und suche nicht automatisch im boot-up
 	
@@ -111,6 +110,7 @@ int main(void)
 	// ONLY FOR DEBUG!!!!! below!
 	// set rtc time
 	setTimeToRtc(3, 3, 3);
+	
 	// set system status
 	// - xxxx.xxx1b time information in system available - a time signal is displayed (if no menu is selected)
 	// - xxx1.xxxxb manual time mode is active

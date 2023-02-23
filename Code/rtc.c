@@ -10,6 +10,7 @@
 *
 *******************************************************************************
 * see: https://www.electronicwings.com/avr-atmega/real-time-clock-rtc-ds1307-interfacing-with-atmega16-32
+* Define 24 hour format!
 */
 
 //! Own header
@@ -19,8 +20,6 @@
 
 #define Device_Write_address	0xD0	/* Define RTC DS1307 slave write address */
 #define Device_Read_address		0xD1	/* Make LSB bit high of slave address for read */
-#define TimeFormat12			0x40	/* Define 12 hour format */
-#define AMPM					0x20
 
 int second=0, minute=0, hour=0, day=0, date=0, month=0, year=0;
 
@@ -31,12 +30,32 @@ extern volatile struct systemParameter systemConfig;
 /* function for clock */
 void RTC_Clock_Write(char _hour, char _minute, char _second)
 {
-	_hour |= AMPM;
+	uint8_t _second_ones;
+	uint8_t _second_tens;
+	uint8_t _second_converted;
+	_second_ones = _second % 10;
+	_second_tens = (_second - _second_ones ) / 10;
+	_second_converted = ((_second_tens << 4) && 0x70) || (_second_ones && 0x0F);
+	
+	uint8_t _minute_ones;
+	uint8_t _minute_tens;
+	uint8_t _minute_converted;
+	_minute_ones = _minute % 10;
+	_minute_tens = (_minute - _minute_ones ) / 10;
+	_minute_converted = ((_minute_tens << 4) && 0x70) || (_minute_ones && 0x0F);
+	
+	uint8_t _hour_ones;
+	uint8_t _hour_tens;
+	uint8_t _hour_converted;
+	_hour_ones = _hour % 10;
+	_hour_tens = (_hour - _hour_ones ) / 10;
+	_hour_converted = ((_hour_tens << 4) && 0x30) || (_hour_ones && 0x0F);	// 24 hour format!
+	
 	I2C_Start(Device_Write_address);	/* Start I2C communication with RTC */
 	I2C_Write(0);						/* Write 0 address for second */
-	I2C_Write(_second);					/* Write second on 00 location */
-	I2C_Write(_minute);					/* Write minute on 01(auto increment) location */
-	I2C_Write(_hour);					/* Write hour on 02 location */
+	I2C_Write(_second_converted);		/* Write second on 00 location */
+	I2C_Write(_minute_converted);		/* Write minute on 01(auto increment) location */
+	I2C_Write(_hour_converted);			/* Write hour on 02 location */
 	I2C_Stop();							/* Stop I2C communication */
 }
 
@@ -46,9 +65,34 @@ void RTC_Clock_Read(void)
 	I2C_Write(0);								/* Write address to read */
 	I2C_Repeated_Start(Device_Read_address);	/* Repeated start with device read address */
 
-	second = I2C_Read_Ack();					/* Read second */
-	minute = I2C_Read_Ack();					/* Read minute */
-	hour = I2C_Read_Nack();						/* Read hour with Nack */
+	uint8_t _second_unconverted;
+	uint8_t _second_ones;
+	uint8_t _second_tens;
+
+	uint8_t _minute_unconverted;
+	uint8_t _minute_ones;
+	uint8_t _minute_tens;
+
+	uint8_t _hour_unconverted;	
+	uint8_t _hour_ones;
+	uint8_t _hour_tens;
+
+	_second_unconverted = I2C_Read_Ack();		/* Read second */
+	_minute_unconverted = I2C_Read_Ack();		/* Read minute */
+	_hour_unconverted = I2C_Read_Nack();		/* Read hour with Nack */
+	
+	_second_ones = _second_unconverted && 0x0F;
+	_second_tens = (_second_unconverted && 0x70) >> 4;
+	second = _second_ones + _second_tens * 10;
+	
+	_minute_ones = _minute_unconverted && 0x0F;
+	_minute_tens = (_minute_unconverted && 0x70) >> 4;
+	minute = _minute_ones + _minute_tens * 10;
+	
+	_hour_ones = _hour_unconverted && 0x0F;
+	_hour_tens = (_hour_unconverted && 0x30) >> 4; // 24 hour format!
+	hour = _hour_ones + _hour_tens * 10;
+	
 	I2C_Stop();									/* Stop i2C communication */
 }
 
@@ -75,15 +119,6 @@ void RTC_Calendar_Read(void)
 	month = I2C_Read_Ack();		/* Read month */
 	year = I2C_Read_Nack();		/* Read the year with Nack */
 	I2C_Stop();					/* Stop i2C communication */
-}
-
-
-uint8_t IsItPM(char hour_)
-{
-	if(hour_ & (AMPM))
-	return 1;
-	else
-	return 0;
 }
 
 //! initialize real time clock via i2c 
