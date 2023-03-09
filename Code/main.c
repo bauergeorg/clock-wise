@@ -106,45 +106,26 @@ int main(void)
 	// - xxxx.0xxxb setting menu is inactive
 	// - xxx0.xxxxb automatic time mode is active
 	systemConfig.status = 0x00;
-
-	// ONLY FOR DEBUG!!!!! below!
-	// set rtc time
-	setTimeToRtc(14, 05, 00);
-
-	// set system status
-	// - xxxx.xxx1b time information in system available - a time signal is displayed (if no menu is selected)
-	// - xxx1.xxxxb manual time mode is active
-	// - xxxx.x1xxb rtc time is active
-	systemConfig.status |= 0x15;
-	// - xxxx.xx0xb searching for dcf77-signal is inactive
-	systemConfig.status &= ~0x02;
-	updateTimeWithRtcValues();
-	// ONLY FOR DEBUG!!!!! above!
 	
 	// check if rtc device has valid values (set status)
-	//checkRtcTime();
+	checkRtcTime();
+	
 	// if device has valid values, take this values to display
 	if(systemConfig.status & 0x04)
 	{
 		// update time values (set status)
+		// set default system status
+		// - xxxx.xxx1b time value available
+		// - xxxx.x1xxb rtc time is available
 		updateTimeWithRtcValues();
+		// - xxxx.xx0xb searching dcf77 signal inactive
+		systemConfig.status &= ~0x02;
 	}
 	// scan dcf 77 signal
 	else
 	{
 		// start receiving
-		startDcf77Signal();					
-		// set new display status: show searching mode
-		systemConfig.displayStatus = DISPLAY_STATE_SEARCH;
-	}
-					
-/*
-	// check for data from rtc
-	// if the rtc communication is failed 
-	if(~getTimeFromRtc())
-	{
-		// start receiving
-		startDcf77Signal();
+		startDcf77Signal();		
 		// set default system status
 		// - xxxx.xx1xb searching dcf77 signal active
 		systemConfig.status |= 0x02;
@@ -154,16 +135,7 @@ int main(void)
 		// - xxxx.x0xxb rtc time is not available
 		systemConfig.status &= ~0x05;
 	}
-	else
-	{
-		// set default system status
-		// - xxxx.xxx1b time information in system available
-		// - xxxx.x1xxb rtc time is available
-		systemConfig.status |= 0x05;
-		// - xxxx.xx0xb searching dcf77 signal inactive
-		systemConfig.status &= ~0x02;
-	}
-*/
+
 	// endless loop
     while (1) 					
 	{

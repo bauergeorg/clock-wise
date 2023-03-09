@@ -25,4 +25,4 @@ void initRtc(void);
 void updateTimeWithRtcValues(void);
 void checkRtcTime(void);
 void getTimeFromRtc(void);
-void setTimeToRtc(uint8_t, uint8_t, uint8_t);
+void setTimeToRtc(uint8_t, uint8_t, uint8_t, uint8_t, uint8_t, uint8_t, uint8_t);

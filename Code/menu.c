@@ -639,7 +639,7 @@ void menuMgnt(uint8_t switches)
 					systemConfig.status &= ~0x02;
 					
 					// set rtc time
-					setTimeToRtc(setTime.hour, setTime.minute, setTime.second);
+					setTimeToRtc(setTime.hour, setTime.minute, setTime.second, setTime.weekday, setTime.day, setTime.month, setTime.year);
 					
 					// stop dcf77 signal
 					stopDcf77Signal();

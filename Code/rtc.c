@@ -21,7 +21,7 @@
 #define Device_Write_address	0xD0	/* Define RTC DS1307 slave write address */
 #define Device_Read_address		0xD1	/* Make LSB bit high of slave address for read */
 
-int second=0, minute=0, hour=0, day=0, date=0, month=0, year=0;
+int second=0, minute=0, hour=0, weekday=0, day=0, month=0, year=0;
 
 //! Extern globals variables
 extern volatile struct time systemTime;
@@ -49,7 +49,7 @@ void RTC_Clock_Write(uint8_t wr_hour, uint8_t wr_minute, uint8_t wr_second)
 	uint8_t hour_converted;
 	hour_ones = wr_hour % 10;
 	hour_tens = (wr_hour - hour_ones ) / 10;
-	hour_converted = ((hour_tens << 4) & 0x30) || (hour_ones & 0x0F);	// 24 hour format!
+	hour_converted = ((hour_tens << 4) & 0x30) | (hour_ones & 0x0F);	// 24 hour format!
 	
 	I2C_Start(Device_Write_address);	/* Start I2C communication with RTC */
 	I2C_Write(0);						/* Write 0 address for second */
@@ -97,14 +97,38 @@ void RTC_Clock_Read(void)
 }
 
 /* function for calendar */
-void RTC_Calendar_Write(uint8_t _day, uint8_t _date, uint8_t _month, uint8_t _year)
+void RTC_Calendar_Write(uint8_t wr_weekday, uint8_t wr_day, uint8_t wr_month, uint8_t wr_year)
 {
+	uint8_t weekday_converted;
+	weekday_converted = wr_weekday & 0x07;
+	
+	uint8_t day_ones;
+	uint8_t day_tens;
+	uint8_t day_converted;
+	day_ones = wr_day % 10;
+	day_tens = (wr_day - day_ones ) / 10;
+	day_converted = ((day_tens << 4) & 0x30) | (day_ones & 0x0F);
+	
+	uint8_t month_ones;
+	uint8_t month_tens;
+	uint8_t month_converted;
+	month_ones = wr_month % 10;
+	month_tens = (wr_month - month_ones ) / 10;
+	month_converted = ((month_tens << 4) & 0x10) | (month_ones & 0x0F);
+
+	uint8_t year_ones;
+	uint8_t year_tens;
+	uint8_t year_converted;
+	year_ones = wr_year % 10;
+	year_tens = (wr_year - year_ones ) / 10;
+	year_converted = ((year_tens << 4) & 0xF0) | (year_ones & 0x0F);
+
 	I2C_Start(Device_Write_address);	/* Start I2C communication with RTC */
 	I2C_Write(3);						/* Write 3 address for day */
-	I2C_Write(_day);					/* Write day on 03 location */
-	I2C_Write(_date);					/* Write date on 04 location */
-	I2C_Write(_month);					/* Write month on 05 location */
-	I2C_Write(_year);					/* Write year on 06 location */
+	I2C_Write(weekday_converted);		/* Write day on 03 location */
+	I2C_Write(day_converted);			/* Write date on 04 location */
+	I2C_Write(month_converted);			/* Write month on 05 location */
+	I2C_Write(year_converted);			/* Write year on 06 location */
 	I2C_Stop();							/* Stop I2C communication */
 }
 
@@ -114,10 +138,39 @@ void RTC_Calendar_Read(void)
 	I2C_Write(3);
 	I2C_Repeated_Start(Device_Read_address);
 
-	day = I2C_Read_Ack();		/* Read day */
-	date = I2C_Read_Ack();		/* Read date */
-	month = I2C_Read_Ack();		/* Read month */
-	year = I2C_Read_Nack();		/* Read the year with Nack */
+	uint8_t weekday_unconverted;
+
+	uint8_t day_unconverted;
+	uint8_t day_ones;
+	uint8_t day_tens;
+
+	uint8_t month_unconverted;
+	uint8_t month_ones;
+	uint8_t month_tens;
+
+	uint8_t year_unconverted;
+	uint8_t year_ones;
+	uint8_t year_tens;
+
+	weekday_unconverted = I2C_Read_Ack();	/* Read day */
+	day_unconverted = I2C_Read_Ack();		/* Read date */
+	month_unconverted = I2C_Read_Ack();		/* Read month */
+	year_unconverted = I2C_Read_Nack();		/* Read the year with Nack */
+	
+	weekday = weekday_unconverted & 0x07;
+
+	day_ones = day_unconverted & 0x0F;
+	day_tens = (day_unconverted & 0x30) >> 4;
+	day = day_ones + day_tens * 10;
+	
+	month_ones = month_unconverted & 0x0F;
+	month_tens = (month_unconverted & 0x10) >> 4;
+	month = month_ones + month_tens * 10;
+	
+	year_ones = year_unconverted & 0x0F;
+	year_tens = (year_unconverted & 0xF0) >> 4;
+	year = year_ones + year_tens * 10;
+	
 	I2C_Stop();					/* Stop i2C communication */
 }
 
@@ -159,10 +212,16 @@ void updateTimeWithRtcValues(void)
 	// read values
 	getTimeFromRtc();
 	
+	// update system time
 	systemTime.hour = hour;
 	systemTime.minute = minute;
 	systemTime.second = second;
 
+	systemTime.day = day;
+	systemTime.month = month;
+	systemTime.year = year;
+	systemTime.weekday = weekday;
+	
 	// set default system status
 	// - xxxx.xxx1b time value available
 	// - xxxx.x1xxb rtc time is available
@@ -179,9 +238,8 @@ void getTimeFromRtc(void)
 
 
 //! set time values from real time clock via i2c
-void setTimeToRtc(uint8_t HH, uint8_t MM, uint8_t SS)
+void setTimeToRtc(uint8_t HH, uint8_t MM, uint8_t SS, uint8_t WEEKDAY, uint8_t DAY, uint8_t MONTH, uint8_t YEAR)
 {
 	RTC_Clock_Write(HH, MM, SS);
-	//RTC_Calendar_Write(char _day, char _date, char _month, char _year)
-					
+	RTC_Calendar_Write(WEEKDAY, DAY, MONTH, YEAR);	
 }

@@ -44,6 +44,7 @@
 #include "dcf77.h"
 #include "system.h"
 #include "gpios.h"
+#include "rtc.h"
 
 //! Own global variables
 // Flag for receiving dcf77 signal
@@ -177,7 +178,7 @@ void decodeDcf77(void)
 	
 	if (dcfArray[28] == 1)
 	{
-		// minute parity bit okey?
+		// minute parity bit okay?
 		if (parity % 2)//parity == 1 || parity == 3 || parity == 5 || parity == 7)
 		{
 			parity = 0;
@@ -417,7 +418,7 @@ void decodeDcf77(void)
 	// check for plausibility
 	if (plausibilityCheck (hour, minute, hourOld, minuteOld))
 	{
-		// if plausibility check okey, set global time values
+		// if plausibility check okay, set global time values
 		systemTime.hour = hour;	
 		systemTime.minute = minute;
 		systemTime.second = 0;
@@ -425,8 +426,10 @@ void decodeDcf77(void)
 		systemTime.month = month;
 		systemTime.year = year;
 		systemTime.weekday = weekday;
-			
+				
 		stopDcf77Signal();
+		
+		setTimeToRtc(systemTime.hour, systemTime.minute, systemTime.second, systemTime.weekday, systemTime.month, systemTime.year, systemTime.weekday);
 	}
 	
 	// save actual time values for next decode session
