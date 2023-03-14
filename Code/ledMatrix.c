@@ -742,6 +742,7 @@ void actualizeMatrixWithSystemTime()
 		}
 	}
 	
+	/*
 	//! special cases: get automatic time, when automatic mode active: Monday 02:12:12
 	// system status
 	// - xxx0.xxxxb automatic time mode is active
@@ -759,19 +760,17 @@ void actualizeMatrixWithSystemTime()
 		// - xxx0.xxxxb automatic time mode is active
 		systemConfig.status &= ~0x11;
 		// - xxxx.xx1xb searching for dcf77-signal is active
-		systemConfig.status |= 0x02;				
-		// set new display status: show searching mode
-		systemConfig.displayStatus = DISPLAY_STATE_SEARCH;	
-		
+		systemConfig.status |= 0x02;						
 		// set default system status
 		// - xxxx.0xxxb setting menu is inactive
 		systemConfig.status &= ~0x08;
-		// set new display status
+		// set new display status: show searching mode -> dark caused by emc
 		systemConfig.displayStatus = DISPLAY_STATE_DARK;
 	
 		// actualize matrix information
 		displayMatrixInformation(0);
 	}
+	*/
 }
 
 // actualize 'actualMatrix' Register with squares or no sequence

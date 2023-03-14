@@ -404,7 +404,7 @@ void decodeDcf77(void)
 		}
 	}
 	else {
-		// minute parity bit okey?
+		// minute parity bit okay?
 		if (!(parity % 2))
 		{
 			parity = 0;
@@ -429,7 +429,7 @@ void decodeDcf77(void)
 				
 		stopDcf77Signal();
 		
-		setTimeToRtc(systemTime.hour, systemTime.minute, systemTime.second, systemTime.weekday, systemTime.month, systemTime.year, systemTime.weekday);
+		setTimeToRtc(systemTime.hour, systemTime.minute, systemTime.second, systemTime.weekday, systemTime.day, systemTime.month, systemTime.year);
 	}
 	
 	// save actual time values for next decode session

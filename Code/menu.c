@@ -175,7 +175,7 @@ void menuMgnt(uint8_t switches)
 					systemConfig.status |= 0x02;
 					
 					// set new display status: show searching mode
-					systemConfig.displayStatus = DISPLAY_STATE_SEARCH;
+					systemConfig.displayStatus = DISPLAY_STATE_DARK;
 															
 					// call menu cancel routine
 					menuCancel();
@@ -637,10 +637,10 @@ void menuMgnt(uint8_t switches)
 					systemConfig.status |= 0x15;
 					// - xxxx.xx0xb searching for dcf77-signal is inactive
 					systemConfig.status &= ~0x02;
-					
+
 					// set rtc time
 					setTimeToRtc(setTime.hour, setTime.minute, setTime.second, setTime.weekday, setTime.day, setTime.month, setTime.year);
-					
+
 					// stop dcf77 signal
 					stopDcf77Signal();
 
