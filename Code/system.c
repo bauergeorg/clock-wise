@@ -27,8 +27,8 @@ void initSystem(void)
 	// - xxxx.xx0xb searching dcf77 signal inactive
 	// - xxxx.x0xxb rtc time is not available
 	// - xxxx.0xxxb setting menu is inactive
-	// - xxx1.xxxxb automatic time mode is active
-	systemConfig.status = 0x10;
+	// - xxx0.xxxxb automatic time mode is inactive
+	systemConfig.status = 0x00;
 	// default light intensity
 	systemConfig.lightIntensity = 10;
 	// set value of potentiometer 		
@@ -47,10 +47,10 @@ void initSystem(void)
 	systemConfig.version = 3;
 	
 	// set init time values
-	systemTime.year		= 18;
-	systemTime.month	= 12;
-	systemTime.day		= 24;
-	systemTime.hour		= 9;
+	systemTime.year		= 1; // 18
+	systemTime.month	= 1; // 12
+	systemTime.day		= 1; // 24
+	systemTime.hour		= 9; // 9
 	systemTime.minute	= 0;
 	systemTime.second	= 0;
 	systemTime.weekday	= 1; // monday

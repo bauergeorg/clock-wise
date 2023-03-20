@@ -416,9 +416,10 @@ void decodeDcf77(void)
 	}
 	
 	// check for plausibility
+	// if plausibility check okay, set global time values
 	if (plausibilityCheck (hour, minute, hourOld, minuteOld))
 	{
-		// if plausibility check okay, set global time values
+
 		systemTime.hour = hour;	
 		systemTime.minute = minute;
 		systemTime.second = 0;
@@ -430,6 +431,11 @@ void decodeDcf77(void)
 		stopDcf77Signal();
 		
 		setTimeToRtc(systemTime.hour, systemTime.minute, systemTime.second, systemTime.weekday, systemTime.day, systemTime.month, systemTime.year);
+	}
+	// if plausibility check NOT okay
+	else {
+		// stop signal
+		stopDcf77Signal();
 	}
 	
 	// save actual time values for next decode session

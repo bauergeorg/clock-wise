@@ -46,7 +46,8 @@ void displayMatrixInformation(uint8_t switchActiviation)
 			if(!switchActiviation)
 			{
 				// actualize 'actualMatrix' Register with searching sequence
-				actualizeMatrixWithSearchingSequence();
+				//actualizeMatrixWithSearchingSequence();
+				setMatrixDark();
 			}
 		}
 	}

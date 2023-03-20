@@ -4,7 +4,7 @@
 *	Date:			04.01.2016
 *
 *	Project-Title:	ClockWise
-*	Description:	µC controlled clock with DCF77, RTC and a led-matrix
+*	Description:	ï¿½C controlled clock with DCF77, RTC and a led-matrix
 *
 *	File-Title:		Real Time Clock (DS 1307)
 *
@@ -186,6 +186,9 @@ void initRtc()
 }
 
 //! check if rtc device has valid time/calendar values
+// set system status
+// - xxxx.x0xxb rtc time is not available
+// - xxxx.x1xxb rtc time is available
 void checkRtcTime()
 {
 	// read values
@@ -207,6 +210,10 @@ void checkRtcTime()
 	}
 }
 
+//! Update sytem time and status
+// set system status
+// - xxxx.xxx1b time value available
+// - xxxx.x1xxb rtc time is available
 void updateTimeWithRtcValues(void)
 {
 	// read values
