@@ -4,7 +4,7 @@
 *	Date:			06.01.2014
 *
 *	Project-Title:	ClockWise
-*	Description:	µC controlled clock with DCF77 and a led-matrix
+*	Description:	uC controlled clock with DCF77 and a led-matrix
 *
 *	File-Title:		Main File
 *
@@ -63,7 +63,7 @@ extern volatile struct time systemTime;
 extern volatile uint8_t dcfArray[60];
 
 // definition of the pause
-const double DELAYUART = 1;  // 1µs	
+const double DELAYUART = 1;  // 1us	
 	
 //! Main routine
 // just do nothing is the best way ;)
