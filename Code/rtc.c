@@ -193,7 +193,7 @@ void checkRtcTime()
 {
 	// read values
 	RTC_Clock_Read();
-	RTC_Calendar_Read();
+	// RTC_Calendar_Read();
 		
 	// check if rtc time is available
 	if((second == 0) && (minute == 0) && (hour == 0))
