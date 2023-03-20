@@ -94,7 +94,7 @@ void initDcf77(void)
 //! Check for plausibility
 // return value is '1', means a correct detection
 // return value is '0', means a failure 
-uint8_t plausibilityCheck (	uint8_t hourNew, uint8_t minuteNew, uint8_t hourOld, uint8_t minuteOld)
+uint8_t plausibilityCheck(uint8_t hourNew, uint8_t minuteNew, uint8_t hourOld, uint8_t minuteOld)
 {
 	// calculate old time value + 1 minute
 	minuteOld++;
