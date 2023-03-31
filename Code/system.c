@@ -28,13 +28,13 @@ void initSystem(void)
 	// - xxxx.x0xxb rtc time is not available
 	// - xxxx.0xxxb setting menu is inactive
 	// - xxx0.xxxxb automatic time mode is inactive
-	systemConfig.status = 0x00;
+	systemConfig.status = 0x00;  // see above
 	// default light intensity
 	systemConfig.lightIntensity = 10;
 	// set value of potentiometer 		
 	systemConfig.potentiometerValue = 10;
 	// default display brightness
-	systemConfig.displayBrightness = calcuateBrightness(systemConfig.lightIntensity, systemConfig.potentiometerValue);
+	systemConfig.displayBrightness = calcuateBrightness(systemConfig.lightIntensity, systemConfig.potentiometerValue); // default values will be taken, no measurement values!
 	// set default system display settings
 	// - xxxx.xxx0b straight pie
 	// - xxxx.001xb original with birthday and horses@6pm
@@ -47,13 +47,13 @@ void initSystem(void)
 	systemConfig.version = 3;
 	
 	// set init time values
-	systemTime.year		= 1; // 18
-	systemTime.month	= 1; // 12
-	systemTime.day		= 1; // 24
-	systemTime.hour		= 9; // 9
+	systemTime.year		= 1;
+	systemTime.month	= 1;
+	systemTime.day		= 1;
+	systemTime.hour		= 9;
 	systemTime.minute	= 0;
 	systemTime.second	= 0;
-	systemTime.weekday	= 1; // monday
+	systemTime.weekday	= 1; // 1 = monday
 }
 
 uint8_t calcuateBrightness(uint8_t lightIntensity, uint8_t potentiometerValue)

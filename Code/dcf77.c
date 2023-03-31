@@ -50,7 +50,7 @@
 // Flag for receiving dcf77 signal
 volatile uint8_t dcfActive = 0;
 // Array for saving receiving dcf77 signal
-volatile uint8_t dcfArray [60];
+volatile uint8_t dcfArray[60];
 
 //! Extern globals variables
 extern volatile struct time systemTime;
@@ -393,7 +393,7 @@ void decodeDcf77(void)
 		
 	if (dcfArray[58] == 1)
 	{
-		// minute parity bit okey?
+		// minute parity bit okay?
 		if (parity % 2)
 		{
 			parity = 0;
@@ -446,7 +446,6 @@ void decodeDcf77(void)
 //! activate dcf77 signal
 void startDcf77Signal(void)
 {
-
 	// set default system status
 	// - xxxx.xx1xb searching dcf77 signal active
 	systemConfig.status |= 0x02;
@@ -513,7 +512,7 @@ ISR(PCINT2_vect)			// start signal 0,1s or 0,2s
 ISR(TIMER0_OVF_vect)
 {
 	// local static variables
-	static uint16_t breakCount = 0;
+	static uint16_t breakCount = 0; // counting at signal pause (break counter)
 	static uint8_t timeCount = 0;
 	static uint8_t arrayCount = 0;
 	
