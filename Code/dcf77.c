@@ -565,12 +565,12 @@ ISR(TIMER0_OVF_vect)
 		{					
 			// decide if last char was short 0,1s (zero: 0,1s/16,384ms=6,1) or long 0,2s (one: 0,2s/16,384ms=12,2)
 			// low (zero): 5 (0,08192s) ... 8 (0,131072s)
-			if (5 <= timeCount <= 8)
+			if (timeCount >= 5 && timeCount <= 8)
 			{
 				dcfArray[arrayCount] = 0;
 			}
 			// high (one): 11 (0,180224s) ... 14 (0,229376s)
-			else if (11 <= timeCount <= 14)
+			else if (timeCount >= 11 && timeCount <= 14)
 			{
 				dcfArray[arrayCount] = 1;
 			}
@@ -588,7 +588,7 @@ ISR(TIMER0_OVF_vect)
 				// reset time counter
 				timeCount = 0;
 				// deactivate dcf77 signal
-				stopDcf77Signal()
+				stopDcf77Signal();
 				return;
 			}
 					
