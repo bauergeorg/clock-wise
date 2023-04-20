@@ -51,6 +51,8 @@
 volatile uint8_t dcfActive = 0;
 // Array for saving receiving dcf77 signal
 volatile uint8_t dcfArray[60];
+// counting at signal pause (break counter)
+volatile uint16_t breakCount = 0; 
 
 //! Extern globals variables
 extern volatile struct time systemTime;
@@ -73,8 +75,6 @@ void initDcf77(void)
 	// 8 bit timer/counter 0
 	// clock select: prescale 1024 -> 16,384ms (61,51757813Hz)
 	TCCR0B = (1 << CS02) | (1 << CS00);	
-	// enable timer/counter 0 interrupt overflow 
-	TIMSK0 |= (1 << TOIE0);
 		
 	//! port settings for activation signal of dcf77 receiver
 	// enable when pc7 low
@@ -461,14 +461,24 @@ void startDcf77Signal(void)
 	// enable when pc7 low
 	// switch PC7 low
 	PORTC &= ~(1 << PC7);
+
+	// enable timer/counter 0 interrupt overflow 
+	TIMSK0 |= (1 << TOIE0);
 	
+	// reset break counter
+	breakCount = 0;
+
 	// test
-	switchOnStatusRed();
+	//switchOnStatusRed();
 }
 
 //! deactivate dcf77 signal
 void stopDcf77Signal(void)
 {
+
+	// disable timer/counter 0 interrupt overflow 
+	TIMSK0 &= ~(1 << TOIE0);
+	
 	// set default system status
 	// - xxxx.xxx1b time information in system available
 	systemConfig.status |= 0x01;
@@ -478,17 +488,20 @@ void stopDcf77Signal(void)
 	//! external interrupt for signal of dcf 77 receiver
 	// disabled external pin change interrupts PCINT23:16
 	PCICR &= ~(1 << PCIE2);
-	// inactivate PC2 (PCINT22) as external interrupt
+	// deactivate PC2 (PCINT22) as external interrupt
 	PCMSK2 &= ~(1 << PCINT22);
 	// delete flag for interrupts PCINT23:16
 	PCIFR |= 1 << PCIF2;
 	
 	// test
-	switchOffStatusRed();
+	//switchOffStatusRed();
 	
 	// disable when pc7 high
 	// switch PC7 on
 	PORTC |= (1 << PC7);
+
+	// reset break counter
+	breakCount = 0;
 }
 
 //! Interrupt Service Routine for when DCF77 signal changes
@@ -507,14 +520,13 @@ ISR(PCINT2_vect)			// start signal 0,1s or 0,2s
 }
 
 //! Interrupt Service Routine for when Timer/Counter 0 has an overflow
-// if variable "dcf_active" is set, this routine will called every 16,384ms (61,51757813Hz)
-// calculated by: 16MHz / 1024 [timer 0 clock divider] / 2^8 [8bit counter] = 61,51757813Hz
+// if variable "dcf_active" is set, this routine will called every 16,384ms (61,03515625Hz)
+// calculated by: 16MHz / 1024 [timer 0 clock divider] / 2^8 [8bit counter] = 61,03515625Hz
 ISR(TIMER0_OVF_vect)
 {
 	// local static variables
-	static uint16_t breakCount = 0; // counting at signal pause (break counter)
-	static uint8_t timeCount = 0;
-	static uint8_t arrayCount = 0;
+	static uint8_t timeCount = 0; 	// counting time of signal high level
+	static uint8_t arrayCount = 0; 	// index pointer to save value in dcfArray array
 	
 	// signal is active
 	if (dcfActive)
@@ -551,15 +563,33 @@ ISR(TIMER0_OVF_vect)
 		// if high level, signal is 
 		else 
 		{					
-			// decide if last char was short 0,1s (zero) or long 0,2s (one)
-			// limit is set at 0,163s is equal with timecount = 9
-			if (timeCount <= 9)
+			// decide if last char was short 0,1s (zero: 0,1s/16,384ms=6,1) or long 0,2s (one: 0,2s/16,384ms=12,2)
+			// low (zero): 5 (0,08192s) ... 8 (0,131072s)
+			if (5 <= timeCount <= 8)
 			{
 				dcfArray[arrayCount] = 0;
 			}
-			else
+			// high (one): 11 (0,180224s) ... 14 (0,229376s)
+			else if (11 <= timeCount <= 14)
 			{
 				dcfArray[arrayCount] = 1;
+			}
+			// signal distortion - failure on receiving signal: abort
+			else
+			{
+				// reset signal char counter
+				arrayCount = 0;
+				// reset dcf77 receive flag
+				dcfActive = 0;
+				// switch off status led yellow
+				switchOffStatusYellow();
+				// switch on status led red
+				switchOnStatusRed();
+				// reset time counter
+				timeCount = 0;
+				// deactivate dcf77 signal
+				stopDcf77Signal()
+				return;
 			}
 					
 			// increment signal char counter
