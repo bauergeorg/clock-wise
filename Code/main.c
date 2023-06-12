@@ -52,7 +52,7 @@
 #include "gpios.h"
 #include "timeMgnt.h"
 
-//#include "usart1.h"
+#include "usart0.h"
 #include "adc.h"
 
 //#include <util/delay.h>
@@ -82,6 +82,7 @@ int main(void)
 	initMatrix();		// matrix management
 	initDcf77();		// dcf77 management
 	initTasks();		// task management
+	initUsart0();		// to communicate
 
 	// read light intensity value of adc
 	systemConfig.lightIntensity = calculateIntensity(adcRead(0));

@@ -234,6 +234,12 @@
     <Compile Include="timeMgnt.h">
       <SubType>compile</SubType>
     </Compile>
+    <Compile Include="usart0.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="usart0.h">
+      <SubType>compile</SubType>
+    </Compile>
     <Compile Include="usart1.c">
       <SubType>compile</SubType>
     </Compile>
