@@ -28,10 +28,10 @@
 */
 
 //! Libraries
-#include "usart.h"
+#include "usart1.h"
 
 //! Initialize Usart 1
-void initUsart(void)
+void initUsart1(void)
 {
 	//! USART1 in SPI Mode
 	// setting XCK1 port pin (PD4) as output, enables master mode
@@ -46,7 +46,7 @@ void initUsart(void)
 	UBRR1 = 9; // 800kHZ
 }
 
-void usartReceiveTransmit(uint8_t data)
+void usart1ReceiveTransmit(uint8_t data)
 {
 	// Wait for empty transmit buffer 
 	while ( !(UCSR1A & (1 << UDRE1)) );

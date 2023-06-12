@@ -16,5 +16,5 @@
 #include <stdint.h>
 
 //! Functional prototypes
-void initUsart(void);
-void usartReceiveTransmit(uint8_t data);
+void initUsart1(void);
+void usart1ReceiveTransmit(uint8_t data);

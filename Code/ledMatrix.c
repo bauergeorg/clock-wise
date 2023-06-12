@@ -23,12 +23,12 @@
 * Pin Declaration:
 *	Pin						| Description
 *	------------------------|-------------------------------------------------
-*	PD1 (Pin 15) as output	| Reset signal (RSTREG)
 *	PD2 (Pin 16) as input	| RXD USART 1 for LED Matrix
 *	PD3 (Pin 17) as output	| TXD USART 1 for LED Matrix
 *	PD4 (Pin 18) as output	| XCK USART 1 for LED Matrix
 *	PD5 (Pin 19) as output	| inverted LED enable (!LEDEN)
 *	PD6 (Pin 20) as output	| Load signal (LOAD)
+*	PD7 (Pin 21) as output	| Reset signal (RSTREG)
 *	------------------------|-------------------------------------------------
 *
 *******************************************************************************
@@ -44,7 +44,7 @@
 
 //! Libraries
 #include "ledMatrix.h"
-#include "usart.h"
+#include "usart1.h"
 #include "system.h"
 #include "dcf77.h"
 #include "gpios.h"
@@ -68,7 +68,7 @@ void initMatrix(void)
 	uint8_t i = 0;
 
 	// Initialize uart as spi
-	initUsart();
+	initUsart1();
 	
 	// set standard values
 	actualRow = 12;
@@ -90,14 +90,14 @@ void initMatrix(void)
 	TIMSK2 |= (1 << OCIE2A) | (1 << TOIE2);
 	
 	//! output: Port D
-	// activate output !LEDEN (PD5), LOAD (PD6) and LEDRESET (PD1)
-	DDRD |= (1 << PD1) |(1 << PD6) | (1 << PD5);
+	// activate output !LEDEN (PD5), LOAD (PD6) and LEDRESET (PD7)
+	DDRD |= (1 << PD7) |(1 << PD6) | (1 << PD5);
 	// switch led matrix off (PD5 = !LEDEN = 1)
 	PORTD |= (1 << PD5);
 	// clear load signal
 	PORTD &= ~(1 << PD6);
 	// set reset port (logical one is NO reset)
-	PORTD |= (1 << PD1);
+	PORTD |= (1 << PD7);
 		
 	// initialize actual output - matrix dark
 	for(i = 0; i<12; i++)
@@ -173,11 +173,11 @@ void sendMatrixToShiftRegister(uint8_t row)
 	}
 
 	// send new values
-	usartReceiveTransmit(actualMatrix[row].high);
+	usart1ReceiveTransmit(actualMatrix[row].high);
 	//_delay_us(DELAYSPI);
-	usartReceiveTransmit(actualMatrix[row].low | rowMaskHigh); // only an OR operation
+	usart1ReceiveTransmit(actualMatrix[row].low | rowMaskHigh); // only an OR operation
 	//_delay_us(DELAYSPI);
-	usartReceiveTransmit(rowMaskLow);
+	usart1ReceiveTransmit(rowMaskLow);
 }
 
 //! take send values to register
@@ -212,13 +212,13 @@ void disableMatrix(void)
 void resetMatrixShiftRegister(void)
 {
 	// Reset signal fall down to logical zero
-	PORTD &= ~(1 << PD1);
+	PORTD &= ~(1 << PD7);
 		
 	// wait a litte bit
 	_delay_us(DELAYRSTREG);
 		
 	// Reset signal comes back to logical one
-	PORTD |= (1 << PD1);
+	PORTD |= (1 << PD7);
 }
 
 //! Interrupt Service Routine when Timer/Counter 2 has an overflow
