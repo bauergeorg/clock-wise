@@ -94,6 +94,20 @@ int main(void)
 	// enable global interrupt
 	sei();
 	
+	usart0ReceiveTransmit(0x53); // S
+	usart0ReceiveTransmit(0x79); // y
+	usart0ReceiveTransmit(0x73); // s
+	usart0ReceiveTransmit(0x74); // t
+	usart0ReceiveTransmit(0x65); // e
+	usart0ReceiveTransmit(0x6d); // m
+	usart0ReceiveTransmit(0x3a); // :
+	usart0ReceiveTransmit(0x20); // (space)
+	usart0ReceiveTransmit(systemConfig.status);
+	usart0ReceiveTransmit(systemConfig.displaySetting);
+	usart0ReceiveTransmit(systemConfig.displayStatus);
+	usart0ReceiveTransmit(0x0d); // CR
+	usart0ReceiveTransmit(0x0a); // LF
+
 	// switsch off test leds
 	switchOffStatusYellow();
 	switchOffStatusRed();
@@ -127,6 +141,48 @@ int main(void)
 		systemConfig.status &= ~0x05;
 	}
 
+	usart0ReceiveTransmit(0x43); // C
+	usart0ReceiveTransmit(0x75); // u
+	usart0ReceiveTransmit(0x72); // r
+	usart0ReceiveTransmit(0x72); // r
+	usart0ReceiveTransmit(0x65); // e
+	usart0ReceiveTransmit(0x6e); // n
+	usart0ReceiveTransmit(0x74); // t
+	usart0ReceiveTransmit(0x20); // (space)
+	usart0ReceiveTransmit(0x54); // T
+	usart0ReceiveTransmit(0x69); // i
+	usart0ReceiveTransmit(0x6d); // m
+	usart0ReceiveTransmit(0x65); // e
+	usart0ReceiveTransmit(0x3a); // :
+	usart0ReceiveTransmit(0x20); // (space)
+	usart0ReceiveTransmit(systemTime.hour);
+	usart0ReceiveTransmit(systemTime.minute);
+	usart0ReceiveTransmit(systemTime.second);
+	usart0ReceiveTransmit(0x0d); // CR
+	usart0ReceiveTransmit(0x0a); // LF
+
+
+	usart0ReceiveTransmit(0x43); // C
+	usart0ReceiveTransmit(0x75); // u
+	usart0ReceiveTransmit(0x72); // r
+	usart0ReceiveTransmit(0x72); // r
+	usart0ReceiveTransmit(0x65); // e
+	usart0ReceiveTransmit(0x6e); // n
+	usart0ReceiveTransmit(0x74); // t
+	usart0ReceiveTransmit(0x20); // (space)
+	usart0ReceiveTransmit(0x44); // D
+	usart0ReceiveTransmit(0x61); // a
+	usart0ReceiveTransmit(0x74); // t
+	usart0ReceiveTransmit(0x65); // e
+	usart0ReceiveTransmit(0x3a); // :
+	usart0ReceiveTransmit(0x20); // (space)
+	usart0ReceiveTransmit(systemTime.year);
+	usart0ReceiveTransmit(systemTime.month);
+	usart0ReceiveTransmit(systemTime.day);
+	usart0ReceiveTransmit(systemTime.weekday);
+	usart0ReceiveTransmit(0x0d); // CR
+	usart0ReceiveTransmit(0x0a); // LF
+	
 	// endless loop
     while (1) 					
 	{
