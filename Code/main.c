@@ -161,7 +161,6 @@ int main(void)
 	usart0ReceiveTransmit(0x0d); // CR
 	usart0ReceiveTransmit(0x0a); // LF
 
-
 	usart0ReceiveTransmit(0x43); // C
 	usart0ReceiveTransmit(0x75); // u
 	usart0ReceiveTransmit(0x72); // r
@@ -188,13 +187,13 @@ int main(void)
 	{
 		// when do nothing
 		checkForTask();
-		
+				
 		// and
-			// read light intensity value of adc
-			systemConfig.lightIntensity = calculateIntensity(adcRead(0));
-			// read potentiometer value of adc
-			systemConfig.potentiometerValue = calculatePotiValue(adcRead(1));
-			// calculate display brightness value
-			systemConfig.displayBrightness = calcuateBrightness(systemConfig.lightIntensity, systemConfig.potentiometerValue);
+		// read light intensity value of adc
+		systemConfig.lightIntensity = calculateIntensity(adcRead(0));
+		// read potentiometer value of adc
+		systemConfig.potentiometerValue = calculatePotiValue(adcRead(1));
+		// calculate display brightness value
+		systemConfig.displayBrightness = calcuateBrightness(systemConfig.lightIntensity, systemConfig.potentiometerValue);
     }	
 }
