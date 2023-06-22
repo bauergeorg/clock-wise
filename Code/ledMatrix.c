@@ -305,7 +305,7 @@ ISR(TIMER2_COMPA_vect)
 	OCR2A = systemConfig.displayBrightness;
 }
 
-// set matrix to total darkness
+// set matrix to total darkness and char
 void setMatrixDark()
 {
 	uint8_t i = 0;
@@ -315,6 +315,8 @@ void setMatrixDark()
 		actualMatrix[i].high = 0b00000000;
 		actualMatrix[i].low	 = 0b00000000;
 	}
+	// disable char
+	switchOffChar();
 }
 
 // set matrix to total brightness
