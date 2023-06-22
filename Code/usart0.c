@@ -29,7 +29,7 @@
 //! Libraries
 #include "usart0.h"
 
-#define FOSC 8000000 // Clock Speed
+#define FOSC 16000000 // Clock Speed
 #define BAUD 9600
 #define MYUBRR (((FOSC / (BAUD * 16UL))) - 1)
 
