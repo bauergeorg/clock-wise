@@ -46,6 +46,8 @@
 #include "gpios.h"
 #include "rtc.h"
 
+#include "usart0.h"
+
 //! Own global variables
 // Flag for receiving dcf77 signal
 volatile uint8_t dcfActive = 0;
@@ -470,6 +472,20 @@ void startDcf77Signal(void)
 
 	// test
 	//switchOnStatusRed();
+
+
+	usart0ReceiveTransmit(0x44); // D
+	usart0ReceiveTransmit(0x43); // C
+	usart0ReceiveTransmit(0x46); // F
+	usart0ReceiveTransmit(0x20); // (space)
+	usart0ReceiveTransmit(0x73); // s
+	usart0ReceiveTransmit(0x74); // t
+	usart0ReceiveTransmit(0x61); // a
+	usart0ReceiveTransmit(0x72); // r
+	usart0ReceiveTransmit(0x74); // t
+	usart0ReceiveTransmit(0x0d); // CR
+	usart0ReceiveTransmit(0x0a); // LF
+
 }
 
 //! deactivate dcf77 signal
@@ -502,6 +518,18 @@ void stopDcf77Signal(void)
 
 	// reset break counter
 	breakCount = 0;
+
+	usart0ReceiveTransmit(0x44); // D
+	usart0ReceiveTransmit(0x43); // C
+	usart0ReceiveTransmit(0x46); // F
+	usart0ReceiveTransmit(0x20); // (space)
+	usart0ReceiveTransmit(0x73); // s
+	usart0ReceiveTransmit(0x74); // t
+	usart0ReceiveTransmit(0x6f); // o
+	usart0ReceiveTransmit(0x70); // p
+	usart0ReceiveTransmit(0x0d); // CR
+	usart0ReceiveTransmit(0x0a); // LF
+
 }
 
 //! Interrupt Service Routine for when DCF77 signal changes

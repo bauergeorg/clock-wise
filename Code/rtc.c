@@ -18,6 +18,8 @@
 #include "rtc.h"
 #include "i2c.h"
 
+#include "usart0.h"
+
 #define Device_Write_address	0xD0	/* Define RTC DS1307 slave write address */
 #define Device_Read_address		0xD1	/* Make LSB bit high of slave address for read */
 
@@ -207,6 +209,22 @@ void checkRtcTime()
 		// set system status
 		// - xxxx.x1xxb rtc time is available
 		systemConfig.status |= 0x04;
+
+		usart0ReceiveTransmit(0x52); // R
+		usart0ReceiveTransmit(0x54); // T
+		usart0ReceiveTransmit(0x43); // C
+		usart0ReceiveTransmit(0x20); // (space)
+		usart0ReceiveTransmit(0x61); // a
+		usart0ReceiveTransmit(0x76); // v
+		usart0ReceiveTransmit(0x61); // a
+		usart0ReceiveTransmit(0x69); // i
+		usart0ReceiveTransmit(0x6c); // l
+		usart0ReceiveTransmit(0x61); // a
+		usart0ReceiveTransmit(0x62); // b
+		usart0ReceiveTransmit(0x6c); // l
+		usart0ReceiveTransmit(0x65); // e
+		usart0ReceiveTransmit(0x0d); // CR
+		usart0ReceiveTransmit(0x0a); // LF
 	}
 }
 

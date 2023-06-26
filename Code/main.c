@@ -140,6 +140,18 @@ int main(void)
 		// - xxxx.x0xxb rtc time is not available
 		systemConfig.status &= ~0x05;
 	}
+	
+	// start receiving
+	startDcf77Signal();
+	// set default system status
+	// - xxxx.xx1xb searching dcf77 signal active
+	systemConfig.status |= 0x02;
+	// set display status to searching sequence
+	systemConfig.displayStatus = DISPLAY_STATE_DARK;
+	// - xxxx.xxx0b no time value available
+	// - xxxx.x0xxb rtc time is not available
+	systemConfig.status &= ~0x05;
+	
 
 	usart0ReceiveTransmit(0x43); // C
 	usart0ReceiveTransmit(0x75); // u
