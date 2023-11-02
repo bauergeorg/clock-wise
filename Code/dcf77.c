@@ -536,7 +536,7 @@ ISR(PCINT2_vect)			// start signal 0,1s or 0,2s
 {
 	// reset of timer 0
 	TCNT0 = 0;						
-	// set dcf77 receive flag 
+	// set dcf77 receive flag (signal is low)
 	dcfActive = 1;
 	
 	// set status led yellow
@@ -555,10 +555,11 @@ ISR(TIMER0_OVF_vect)
 	static uint8_t timeCount = 0; 	// counting time of signal high level
 	static uint8_t arrayCount = 0; 	// index pointer to save value in dcfArray array
 	
-	// flag for signal with distortion
-	uint8_t distortion = 0;
+	// flag for current distortion
+	uint8_t current_distortion = 0;
+	static uint8_t last_signal_was_distorted = 0;
 
-	// signal is active
+	// signal is active (signal is low)
 	if (dcfActive)
 	{
 	
@@ -588,34 +589,22 @@ ISR(TIMER0_OVF_vect)
 		// if low level, count the time
 		if (!(PINC & (1 << PC6)))
 		{	
-			timeCount++;	
+			timeCount++;
 		}
 		// if high level, signal is 
 		else 
 		{					
+			// counting at signal pause (break counter)
+			breakCount++;
+
 			// signal distortion - failure on receiving signal: do nothing
 			// decide if last char was short 0,1s (zero: 0,1s/16,384ms=6,1) or long 0,2s (one: 0,2s/16,384ms=12,2)
 			// distortion: shorter than 4 (0,049152s)
 			if (timeCount <= 3)
 			{
 				// short distortion
-				distortion = 0x01;
-				breakCount++;
+				current_distortion = 0x01;
 				usart0ReceiveTransmit(0x11);
-
-				// reset signal char counter
-				//arrayCount = 0;
-				// reset dcf77 receive flag
-				//dcfActive = 0;
-				// switch off status led yellow
-				switchOffStatusYellow();
-				// switch on status led red
-				switchOnStatusRed();
-				// reset time counter
-				timeCount = 0;
-				// deactivate dcf77 signal
-				//stopDcf77Signal();
-				return;
 			}
 			// decide if last char was short 0,1s (zero: 0,1s/16,384ms=6,1) or long 0,2s (one: 0,2s/16,384ms=12,2)
 			// low (zero): 3 (0,049152s) ... 8 (0,131072s)
@@ -628,23 +617,8 @@ ISR(TIMER0_OVF_vect)
 			else if (timeCount > 8 && timeCount < 10)
 			{
 				// short distortion
-				distortion = 0x01;
-				breakCount++;
+				current_distortion = 0x01;
 				usart0ReceiveTransmit(0x12);
-
-				// reset signal char counter
-				//arrayCount = 0;
-				// reset dcf77 receive flag
-				//dcfActive = 0;
-				// switch off status led yellow
-				switchOffStatusYellow();
-				// switch on status led red
-				switchOnStatusRed();
-				// reset time counter
-				timeCount = 0;
-				// deactivate dcf77 signal
-				//stopDcf77Signal();
-				return;
 			}
 			// high (one): 10 (0,16384s) ... 14 (0,229376s)
 			else if (timeCount >= 10 && timeCount <= 14)
@@ -656,45 +630,54 @@ ISR(TIMER0_OVF_vect)
 			else
 			{
 				// long distortion
-				distortion = 0x01;
-				breakCount++;
+				current_distortion = 0x01;
 				usart0ReceiveTransmit(0x14);
+			}
 
+			// in case of no distortion
+			if (current_distortion == 0)
+			{
+				// reset break counter
+				breakCount = 0;
+				// increment signal char counter
+				arrayCount++;
+				// reset dcf77 receive flag
+				dcfActive = 0;
+				// switch off status led yellow
+				switchOffStatusYellow();
+				// reset time counter
+				timeCount = 0;
+				// clear flag for next time
+				last_signal_was_distorted = 0x00;
+				// activate PC6 (PCINT22) as external interrupt
+				PCMSK2 |= 1 << PCINT22;
+			}
+			// in case of a distortion
+			else
+			{
+				if (last_signal_was_distorted == 0x01)
+				{
+					timeCount += breakCount;
+				}		
+		
+				// reset break counter
+				breakCount = 0;
 				// reset signal char counter
 				//arrayCount = 0;
-				// reset dcf77 receive flag
-				//dcfActive = 0;
+				// // reset dcf77 receive flag
+				dcfActive = 0;
 				// switch off status led yellow
 				switchOffStatusYellow();
 				// switch on status led red
 				switchOnStatusRed();
-				// reset time counter
-				timeCount = 0;
-				// deactivate dcf77 signal
-				//stopDcf77Signal();
-				return;
-			}
-
-			// in case of no distortion
-			if (distortion == 0)
-			{
-				// reset break counter
-				breakCount = 0;
-
-				// increment signal char counter
-				arrayCount++;
-
-				// reset dcf77 receive flag
-				dcfActive = 0;
-				
-				// switch off status led yellow
-				switchOffStatusYellow();
-
-				// reset time counter
-				timeCount = 0;
+				// set flag for next time
+				last_signal_was_distorted = 0x01;
 				// activate PC6 (PCINT22) as external interrupt
 				PCMSK2 |= 1 << PCINT22;
-			}	
+				// deactivate dcf77 signal
+				//stopDcf77Signal();
+			}
+
 		}
 	}
 	else
