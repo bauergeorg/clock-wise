@@ -52,10 +52,15 @@
 // Flag for receiving dcf77 signal
 volatile uint8_t dcfActive = 0;
 volatile uint8_t breakActive = 0;
+volatile uint8_t estimateReceivingType = 0;		// 0 = don't know
+												// 1 = signal
+												// 2 = break
+
 // Array for saving receiving dcf77 signal
 volatile uint8_t dcfArray[60];
 // counting at signal pause (break counter)
 volatile uint16_t breakCount = 0; 
+
 
 //! Extern globals variables
 extern volatile struct time systemTime;
@@ -145,7 +150,7 @@ void decodeDcf77(void)
 	// 1m 2m 4m 8m 10 20 50 pm
 	if (dcfArray[21] == 1)
 	{
-		minute = 1;	// add 1 minute
+		minute += 1;	// add 1 minute
 		parity++;
 	}
 	if (dcfArray[22] == 1)
@@ -209,7 +214,7 @@ void decodeDcf77(void)
 	// 1h 2h 4h 8h 10 20 ph
 	if (dcfArray[29] == 1)
 	{	
-		hour = 1;		// add 1 hour
+		hour += 1;		// add 1 hour
 		parity++;
 	}
 	if (dcfArray[30] == 1)
@@ -270,7 +275,7 @@ void decodeDcf77(void)
 	
 	if (dcfArray[36] == 1)
 	{
-		day = 1;	// add 1 day
+		day += 1;	// add 1 day
 		parity++;
 	}
 	if (dcfArray[37] == 1)
@@ -305,7 +310,7 @@ void decodeDcf77(void)
 	
 	if (dcfArray[42] == 1)
 	{
-		weekday = 1;	// add 1 day
+		weekday += 1;	// add 1 day
 		parity++;
 	}	
 	if (dcfArray[43] == 1)
@@ -325,7 +330,7 @@ void decodeDcf77(void)
 	
 	if (dcfArray[45] == 1)
 	{
-		month = 1;	// add 1 month
+		month += 1;	// add 1 month
 		parity++;
 	}	
 	if (dcfArray[46] == 1)
@@ -355,7 +360,7 @@ void decodeDcf77(void)
 	
 	if (dcfArray[50] == 1)
 	{
-		year = 1;	// add 1 year
+		year += 1;	// add 1 year
 		parity++;
 	}
 	if (dcfArray[51] == 1)
@@ -453,6 +458,9 @@ void startDcf77Signal(void)
 	// - xxxx.xx1xb searching dcf77 signal active
 	systemConfig.status |= 0x02;
 	
+	// current receiving is a dont-know 
+	estimateReceivingType = 0;
+
 	//! external interrupt for signal of dcf 77 receiver
 	// enabled external pin change interrupts PCINT23:16
 	PCICR |= 1 << PCIE2;
@@ -470,9 +478,6 @@ void startDcf77Signal(void)
 	
 	// reset break counter
 	breakCount = 0;
-
-	// test
-	//switchOnStatusRed();
 
 	usart0ReceiveTransmit(0x44); // D
 	usart0ReceiveTransmit(0x43); // C
@@ -530,6 +535,24 @@ void stopDcf77Signal(void)
 	usart0ReceiveTransmit(0x0d); // CR
 	usart0ReceiveTransmit(0x0a); // LF
 
+	uint8_t i = 0; 
+	for (i=0; i<59; i++)
+	{
+		usart0ReceiveTransmit(dcfArray[i]);
+	}
+	usart0ReceiveTransmit(0x0d); // CR
+	usart0ReceiveTransmit(0x0a); // LF
+
+	usart0ReceiveTransmit(systemTime.hour);
+	usart0ReceiveTransmit(systemTime.minute);
+	usart0ReceiveTransmit(systemTime.second);
+	usart0ReceiveTransmit(systemTime.day);
+	usart0ReceiveTransmit(systemTime.month);
+	usart0ReceiveTransmit(systemTime.year);
+	usart0ReceiveTransmit(systemTime.weekday);
+	usart0ReceiveTransmit(0x0d); // CR
+	usart0ReceiveTransmit(0x0a); // LF
+
 }
 
 //! Interrupt Service Routine for when DCF77 signal changes
@@ -559,6 +582,7 @@ ISR(TIMER0_OVF_vect)
 	uint8_t signalFinishedFlag = 0;
 
 	uint8_t current_distortion = 0;
+	uint8_t abort 			   = 0;
 
 	// * Time counter section *
 	// signal is active (signal is low)
@@ -571,7 +595,8 @@ ISR(TIMER0_OVF_vect)
 			if (breakActive == 1)
 			{
 				breakFinishedFlag = 1;
-				usart0ReceiveTransmit(0x80); // debug: 0x80 = break is finished
+				// debug: 0x80 = break is finished
+				usart0ReceiveTransmit(0x80); 
 			}
 			// reset break active flag
 			breakActive = 0;
@@ -584,7 +609,8 @@ ISR(TIMER0_OVF_vect)
 		{					
 			// edge detected: signal is finished -> set signal finished flag
 			signalFinishedFlag = 1;
-			usart0ReceiveTransmit(0x82);	// debug: 0x82 = signal is finished
+			// debug: 0x82 = signal is finished
+			usart0ReceiveTransmit(0x82);	
 
 			// counting at signal pause (break counter)
 			breakCount++;
@@ -609,7 +635,7 @@ ISR(TIMER0_OVF_vect)
 
 	// * Evaluate counted times *
 
-	// in case of new signal is finished
+	// in case of new signal is finished: TODO Error handling!!!!
 	if(signalFinishedFlag && breakFinishedFlag)
 	{
 		usart0ReceiveTransmit(0x91);		// debug: 0x92 = ERROR
@@ -622,14 +648,21 @@ ISR(TIMER0_OVF_vect)
 		// reset all counters and activate the external interrupt
 		if (breakCount > 91)
 		{
+			// current receiving is a signal 
+			estimateReceivingType = 1;
+
+			// debug: 0x22 = long time break (>1,5 seconds)
+			usart0ReceiveTransmit(0x22);
+			usart0ReceiveTransmit(estimateReceivingType);
+
 			// if 58th characters received (array counter is out of range) 
 			// run the execution function 
 			if (arrayCount >= 58)
 			{
+				// debug: 0x23 = char 58 detected
+				usart0ReceiveTransmit(0x23);		
 				decodeDcf77();
 			}
-
-			usart0ReceiveTransmit(0x22);		// debug: 0x22 = char 58 detected
 
 			// reset break counter
 			breakCount = 0;
@@ -645,16 +678,54 @@ ISR(TIMER0_OVF_vect)
 		// a valid pause signal is measured
 		if (breakCount >= 45 && breakCount <= 60)
 		{
+			// current receiving is a signal 
+			estimateReceivingType = 1;
+			
 			// reset break counter
 			breakCount = 0;
-			usart0ReceiveTransmit(0x20); 	// debug: 0x20 = valid pause detected
+			// debug: 0x20 = valid pause detected
+			usart0ReceiveTransmit(0x20);
+			usart0ReceiveTransmit(estimateReceivingType);
+		}
+		// is signal pause smaller than 0,73728s and 0,98304s
+		// a valid pause signal is measured
+		if (breakCount <= 45)
+		{
+			// current receiving is a signal 
+			estimateReceivingType = 1;
+			
+			// reset break counter
+			breakCount = 0;
+			// debug: 0x20 = valid pause detected
+			usart0ReceiveTransmit(0x20);
+			usart0ReceiveTransmit(estimateReceivingType);
 		}
 		else
 		// a invalid pause signal is measured
-		{
-			usart0ReceiveTransmit(0x21);	// debug: 0x21 = invalid pause detected
-		}
+		{		
+			// short distortion
+			current_distortion = 0x01;
+			// do net reset break counter
+			// switch on status led red
+			switchOnStatusRed();
+			// debug: 0x21 = invalid pause detected
+			usart0ReceiveTransmit(0x21);	
 
+			// receiving a signal
+			if (estimateReceivingType == 1)
+			{
+				// break count to signal
+				signalCount = signalCount + breakCount;
+				// reset break counter
+				breakCount = 0;
+			}
+			// receiving a break or a dont-know
+			else
+			{
+				// reset time counter
+				signalCount = 0;
+			}
+		}
 	}
 
 	// in case of new signal is finished
@@ -667,43 +738,132 @@ ISR(TIMER0_OVF_vect)
 		{
 			// short distortion
 			current_distortion = 0x01;
+			// debug: 0x11 = invalid signal detected
 			usart0ReceiveTransmit(0x11);
+
+			// receiving a break
+			if (estimateReceivingType == 2)
+			{
+				// singal count to break
+				breakCount = breakCount + signalCount;
+
+				// reset dcf77 receive flag
+				dcfActive = 0;
+				// switch off status led yellow
+				switchOffStatusYellow();
+				// reset time counter
+				signalCount = 0;
+				// clear flag for next time
+				//last_signal_was_distorted = 0x00;
+				// activate PC6 (PCINT22) as external interrupt
+				PCMSK2 |= 1 << PCINT22;
+			}
+			// receiving a signal or a dont-know
+			else
+			{
+				// // singal count to break
+				// breakCount = breakCount + signalCount
+				// reset dcf77 receive flag
+				dcfActive = 0;
+				// switch off status led yellow
+				switchOffStatusYellow();
+				// // reset time counter
+				// signalCount = 0;
+				// clear flag for next time
+				//last_signal_was_distorted = 0x00;
+				// activate PC6 (PCINT22) as external interrupt
+				PCMSK2 |= 1 << PCINT22;
+			}
 		}
 		// decide if last char was short 0,1s (zero: 0,1s/16,384ms=6,1) or long 0,2s (one: 0,2s/16,384ms=12,2)
-		// low (zero): 3 (0,049152s) ... 8 (0,131072s)
+		// low (zero) detected : 3 (0,049152s) ... 8 (0,131072s)
 		else if (signalCount >= 3 && signalCount <= 8)
 		{
+			// save detected value to array
 			dcfArray[arrayCount] = 0;
+			// debug: 0x00 = valid zero value detected
 			usart0ReceiveTransmit(0x00);
+			// // reset break counter
+			// breakCount = 0;
+			// increment signal char counter
+			arrayCount++;
+
+			// current receiving is a break 
+			estimateReceivingType = 2;
+			usart0ReceiveTransmit(estimateReceivingType);
+
+			// reset dcf77 receive flag
+			dcfActive = 0;
+			// switch off status led yellow
+			switchOffStatusYellow();
+			// reset time counter
+			signalCount = 0;
+			// clear flag for next time
+			//last_signal_was_distorted = 0x00;
+			// activate PC6 (PCINT22) as external interrupt
+			PCMSK2 |= 1 << PCINT22;
+
 		}
 		// distortion: 8 (0,131072s) ... 10 (0,16384s)
 		else if (signalCount > 8 && signalCount < 10)
 		{
 			// short distortion
 			current_distortion = 0x01;
+			// switch on status led red
+			switchOnStatusRed();
+			// debug: 0x12 = invalid signal detected
 			usart0ReceiveTransmit(0x12);
+
+			// receiving a break
+			if (estimateReceivingType == 2)
+			{
+				// singal count to break
+				breakCount = breakCount + signalCount;
+
+				// reset dcf77 receive flag
+				dcfActive = 0;
+				// switch off status led yellow
+				switchOffStatusYellow();
+				// reset time counter
+				signalCount = 0;
+				// clear flag for next time
+				//last_signal_was_distorted = 0x00;
+				// activate PC6 (PCINT22) as external interrupt
+				PCMSK2 |= 1 << PCINT22;
+			}
+			// receiving a signal or a dont-know
+			else
+			{
+				// // singal count to break
+				// breakCount = breakCount + signalCount
+				// reset dcf77 receive flag
+				dcfActive = 0;
+				// switch off status led yellow
+				switchOffStatusYellow();
+				// // reset time counter
+				// signalCount = 0;
+				// clear flag for next time
+				//last_signal_was_distorted = 0x00;
+				// activate PC6 (PCINT22) as external interrupt
+				PCMSK2 |= 1 << PCINT22;
+			}
 		}
 		// high (one): 10 (0,16384s) ... 14 (0,229376s)
 		else if (signalCount >= 10 && signalCount <= 14)
 		{
+			// save detected value to array
 			dcfArray[arrayCount] = 1;
+			// debug: 0x01 = valid one value detected
 			usart0ReceiveTransmit(0x01);
-		}
-		// signal distortion - failure on receiving signal: abort
-		else
-		{
-			// long distortion
-			current_distortion = 0x01;
-			usart0ReceiveTransmit(0x14);
-		}
-
-		// in case of no distortion
-		if (current_distortion == 0)
-		{
-			// reset break counter
-			breakCount = 0;
+			// // reset break counter
+			// breakCount = 0;
 			// increment signal char counter
 			arrayCount++;
+
+			// current receiving is a break 
+			estimateReceivingType = 2;
+			usart0ReceiveTransmit(estimateReceivingType);
+
 			// reset dcf77 receive flag
 			dcfActive = 0;
 			// switch off status led yellow
@@ -715,6 +875,77 @@ ISR(TIMER0_OVF_vect)
 			// activate PC6 (PCINT22) as external interrupt
 			PCMSK2 |= 1 << PCINT22;
 		}
+		// signal distortion - failure on receiving signal
+		else
+		{
+			// long distortion
+			current_distortion = 0x01;
+			// switch on status led red
+			switchOnStatusRed();
+			// debug: 0x14 = invalid signal detected
+			usart0ReceiveTransmit(0x14);
+
+			// receiving a break
+			if (estimateReceivingType == 2)
+			{
+				// singal count to break
+				breakCount = breakCount + signalCount;
+
+				// reset dcf77 receive flag
+				dcfActive = 0;
+				// switch off status led yellow
+				switchOffStatusYellow();
+				// reset time counter
+				signalCount = 0;
+				// clear flag for next time
+				//last_signal_was_distorted = 0x00;
+				// activate PC6 (PCINT22) as external interrupt
+				PCMSK2 |= 1 << PCINT22;
+			}
+			// receiving a signal or a dont-know
+			else
+			{
+				// // singal count to break
+				// breakCount = breakCount + signalCount
+				// reset dcf77 receive flag
+				dcfActive = 0;
+				// switch off status led yellow
+				switchOffStatusYellow();
+				// // reset time counter
+				// signalCount = 0;
+				// clear flag for next time
+				//last_signal_was_distorted = 0x00;
+				// activate PC6 (PCINT22) as external interrupt
+				PCMSK2 |= 1 << PCINT22;
+			}
+		}
+
+		// // in case of no distortion
+		// if (current_distortion == 0)
+		// {
+		// 	// reset break counter
+		// 	breakCount = 0;
+		// 	// increment signal char counter
+		// 	arrayCount++;
+		// 	// reset dcf77 receive flag
+		// 	dcfActive = 0;
+		// 	// switch off status led yellow
+		// 	switchOffStatusYellow();
+		// 	// reset time counter
+		// 	signalCount = 0;
+		// 	// clear flag for next time
+		// 	//last_signal_was_distorted = 0x00;
+		// 	// activate PC6 (PCINT22) as external interrupt
+		// 	PCMSK2 |= 1 << PCINT22;
+		// }
+		// // in case of distortion
+		// else
+		// {
+		// 	// switch on status led red
+		// 	switchOnStatusRed();
+		// }
+
+
 		// // in case of a distortion
 		// else
 		// {
