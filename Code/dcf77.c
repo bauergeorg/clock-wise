@@ -105,6 +105,7 @@ void initDcf77(void)
 uint8_t plausibilityCheck(uint8_t hourNew, uint8_t minuteNew, uint8_t hourOld, uint8_t minuteOld)
 {
 	// calculate old time value + 1 minute
+	// with overflow handling
 	minuteOld++;
 	if (minuteOld == 60)
 	{
@@ -207,7 +208,7 @@ void decodeDcf77(void)
 			return;
 		}
 	}	
-	
+
 	// decode hour information
 	// hours
 	// 29 30 31 32 33 34 35
@@ -423,11 +424,23 @@ void decodeDcf77(void)
 		}
 	}
 	
+	// stop signal		
+	stopDcf77Signal();
+
+	usart0ReceiveTransmit(hour);
+	usart0ReceiveTransmit(minute);
+	usart0ReceiveTransmit(0);
+	usart0ReceiveTransmit(day);
+	usart0ReceiveTransmit(month);
+	usart0ReceiveTransmit(year);
+	usart0ReceiveTransmit(weekday);
+	usart0ReceiveTransmit(0x0d); // CR
+	usart0ReceiveTransmit(0x0a); // LF
+
 	// check for plausibility
 	// if plausibility check okay, set global time values
 	if (plausibilityCheck (hour, minute, hourOld, minuteOld))
 	{
-
 		systemTime.hour = hour;	
 		systemTime.minute = minute;
 		systemTime.second = 0;
@@ -435,17 +448,25 @@ void decodeDcf77(void)
 		systemTime.month = month;
 		systemTime.year = year;
 		systemTime.weekday = weekday;
-				
-		stopDcf77Signal();
-		
+
+		usart0ReceiveTransmit(0xFA);
+		usart0ReceiveTransmit(0x0d); // CR
+		usart0ReceiveTransmit(0x0a); // LF
+
+		// write into rtc
 		setTimeToRtc(systemTime.hour, systemTime.minute, systemTime.second, systemTime.weekday, systemTime.day, systemTime.month, systemTime.year);
 	}
 	// if plausibility check NOT okay
-	else {
-		// stop signal
-		stopDcf77Signal();
+	else
+	{
+
+		usart0ReceiveTransmit(0xFF);
+		usart0ReceiveTransmit(0x0d); // CR
+		usart0ReceiveTransmit(0x0a); // LF
+
+		// restart dcf signal detection
+		startDcf77Signal();
 	}
-	
 	// save actual time values for next decode session
 	minuteOld = minute;
 	hourOld = hour;
@@ -535,23 +556,23 @@ void stopDcf77Signal(void)
 	usart0ReceiveTransmit(0x0d); // CR
 	usart0ReceiveTransmit(0x0a); // LF
 
-	uint8_t i = 0; 
-	for (i=0; i<59; i++)
-	{
-		usart0ReceiveTransmit(dcfArray[i]);
-	}
-	usart0ReceiveTransmit(0x0d); // CR
-	usart0ReceiveTransmit(0x0a); // LF
+	// uint8_t i = 0; 
+	// for (i=0; i<59; i++)
+	// {
+	// 	usart0ReceiveTransmit(dcfArray[i]);
+	// }
+	// usart0ReceiveTransmit(0x0d); // CR
+	// usart0ReceiveTransmit(0x0a); // LF
 
-	usart0ReceiveTransmit(systemTime.hour);
-	usart0ReceiveTransmit(systemTime.minute);
-	usart0ReceiveTransmit(systemTime.second);
-	usart0ReceiveTransmit(systemTime.day);
-	usart0ReceiveTransmit(systemTime.month);
-	usart0ReceiveTransmit(systemTime.year);
-	usart0ReceiveTransmit(systemTime.weekday);
-	usart0ReceiveTransmit(0x0d); // CR
-	usart0ReceiveTransmit(0x0a); // LF
+	// usart0ReceiveTransmit(systemTime.hour);
+	// usart0ReceiveTransmit(systemTime.minute);
+	// usart0ReceiveTransmit(systemTime.second);
+	// usart0ReceiveTransmit(systemTime.day);
+	// usart0ReceiveTransmit(systemTime.month);
+	// usart0ReceiveTransmit(systemTime.year);
+	// usart0ReceiveTransmit(systemTime.weekday);
+	// usart0ReceiveTransmit(0x0d); // CR
+	// usart0ReceiveTransmit(0x0a); // LF
 
 }
 
@@ -753,15 +774,19 @@ ISR(TIMER0_OVF_vect)
 					usart0ReceiveTransmit(0x24);		
 					decodeDcf77();
 				}
-
-				// reset break counter
-				breakCount = 0;
-				// reset signal counter
-				signalCount = 0;
-				// reset signal char counter
-				arrayCount = 0;
-				// activate PC6 (PCINT22) as external interrupt
-				PCMSK2 |= (1 << PCINT22);
+				else
+				{
+					// new try >> reset all <<
+					
+					// reset break counter
+					breakCount = 0;
+					// reset signal counter
+					signalCount = 0;
+					// reset signal char counter
+					arrayCount = 0;
+					// activate PC6 (PCINT22) as external interrupt
+					PCMSK2 |= (1 << PCINT22);
+				}
 
 				return;
 			}
@@ -1083,38 +1108,8 @@ ISR(TIMER0_OVF_vect)
 
 			}
 		}
-		// valid signal: receiving a break or a dont-know
-		else if (signalCount >= 9 && signalCount <= 14)
-			{
-				// next receiving is a signal 
-				estimateReceivingType = 1;
-
-				// debug: 0x22 = long time break (>1,5 seconds)
-				usart0ReceiveTransmit(0x22);
-				usart0ReceiveTransmit(estimateReceivingType);
-
-				// if 58th characters received (array counter is out of range) 
-				// run the execution function 
-				if (arrayCount >= 58)
-				{
-					// debug: 0x24 = char 58 detected
-					usart0ReceiveTransmit(0x24);		
-					decodeDcf77();
-				}
-
-				// reset break counter
-				breakCount = 0;
-				// reset signal counter
-				signalCount = 0;
-				// reset signal char counter
-				arrayCount = 0;
-				// activate PC6 (PCINT22) as external interrupt
-				PCMSK2 |= (1 << PCINT22);
-
-				return;
-			}
 		// long dingal > 2 secs: abort
-		else if (signalCount = 125)
+		else if (signalCount >= 125)
 		{
 			// long distortion
 			current_distortion = 0x01;
@@ -1204,58 +1199,5 @@ ISR(TIMER0_OVF_vect)
 				PCMSK2 |= 1 << PCINT22;
 			}
 		}
-
-		// // in case of no distortion
-		// if (current_distortion == 0)
-		// {
-		// 	// reset break counter
-		// 	breakCount = 0;
-		// 	// increment signal char counter
-		// 	arrayCount++;
-		// 	// reset dcf77 receive flag
-		// 	dcfActive = 0;
-		// 	// switch off status led yellow
-		// 	switchOffStatusYellow();
-		// 	// reset time counter
-		// 	signalCount = 0;
-		// 	// clear flag for next time
-		// 	//last_signal_was_distorted = 0x00;
-		// 	// activate PC6 (PCINT22) as external interrupt
-		// 	PCMSK2 |= 1 << PCINT22;
-		// }
-		// // in case of distortion
-		// else
-		// {
-		// 	// switch on status led red
-		// 	switchOnStatusRed();
-		// }
-
-
-		// // in case of a distortion
-		// else
-		// {
-		// 	if (last_signal_was_distorted == 0x01)
-		// 	{
-		// 		signalCount += breakCount;
-		// 	}		
-	
-		// 	// reset break counter
-		// 	breakCount = 0;
-		// 	// reset signal char counter
-		// 	//arrayCount = 0;
-		// 	// // reset dcf77 receive flag
-		// 	dcfActive = 0;
-		// 	// switch off status led yellow
-		// 	switchOffStatusYellow();
-		// 	// switch on status led red
-		// 	switchOnStatusRed();
-		// 	// set flag for next time
-		// 	last_signal_was_distorted = 0x01;
-		// 	// activate PC6 (PCINT22) as external interrupt
-		// 	PCMSK2 |= 1 << PCINT22;
-		// 	// deactivate dcf77 signal
-		// 	//stopDcf77Signal();
-		// }
-
 	}
 }
