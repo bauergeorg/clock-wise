@@ -104,29 +104,35 @@ void initDcf77(void)
 // return value is '0', means a failure 
 uint8_t plausibilityCheck(uint8_t hourNew, uint8_t minuteNew, uint8_t hourOld, uint8_t minuteOld)
 {
-	// calculate old time value + 1 minute
-	// with overflow handling
-	minuteOld++;
-	if (minuteOld == 60)
-	{
-		minuteOld = 0;
-		hourOld++;
-		if (hourOld == 24)
-		{
-			hourOld = 0;			
-		}
-	}
-	
+
 	// compare new time values with old time values
 	// if two received decoded time values equal, return a correct return flag 
-	if (minuteNew == minuteOld)
+	if ((minuteNew == (minuteOld-1)) || (minuteNew == 0 && (minuteOld == 59)))
 	{
 		if (hourNew == hourOld)
 		{
+			
 			return 1;
 		}
 	}
+		
 	return 0;
+}
+
+void updateDcf77_backupTime(uint8_t *hourOld, uint8_t *minuteOld)
+{
+	// calculate old time value + 1 minute
+	// with overflow handling
+	*minuteOld = *minuteOld + 1;
+	if (*minuteOld == 60)
+	{
+		*minuteOld = 0;
+		*hourOld = *hourOld +1;
+		if (*hourOld == 24)
+		{
+			*hourOld = 0;
+		}
+	}
 }
 
 //! Decode dcf77 received bits
@@ -135,7 +141,9 @@ void decodeDcf77(void)
 	// static variables for time values for next decode session
 	static uint8_t minuteOld = 0;
 	static uint8_t hourOld = 0;
-	
+
+	uint8_t check = 0;
+
 	// variables for actual received values
 	uint8_t minute = 0;
 	uint8_t hour = 0;
@@ -144,6 +152,8 @@ void decodeDcf77(void)
 	uint8_t year = 0;
 	uint8_t weekday = 0;
 	uint8_t parity = 0;
+	
+	updateDcf77_backupTime(&hourOld, &minuteOld);
 	
 	// decode minute information
 	// minutes
@@ -437,9 +447,12 @@ void decodeDcf77(void)
 	usart0ReceiveTransmit(0x0d); // CR
 	usart0ReceiveTransmit(0x0a); // LF
 
+	// check received time
+	check = plausibilityCheck(hour, minute, hourOld, minuteOld);
+
 	// check for plausibility
 	// if plausibility check okay, set global time values
-	if (plausibilityCheck (hour, minute, hourOld, minuteOld))
+	if (check == 1)
 	{
 		systemTime.hour = hour;	
 		systemTime.minute = minute;
@@ -449,24 +462,20 @@ void decodeDcf77(void)
 		systemTime.year = year;
 		systemTime.weekday = weekday;
 
-		usart0ReceiveTransmit(0xFA);
-		usart0ReceiveTransmit(0x0d); // CR
-		usart0ReceiveTransmit(0x0a); // LF
-
 		// write into rtc
 		setTimeToRtc(systemTime.hour, systemTime.minute, systemTime.second, systemTime.weekday, systemTime.day, systemTime.month, systemTime.year);
+		
+		// disable red led
+		switchOffStatusRed();
+		
 	}
 	// if plausibility check NOT okay
 	else
 	{
-
-		usart0ReceiveTransmit(0xFF);
-		usart0ReceiveTransmit(0x0d); // CR
-		usart0ReceiveTransmit(0x0a); // LF
-
 		// restart dcf signal detection
 		startDcf77Signal();
 	}
+	
 	// save actual time values for next decode session
 	minuteOld = minute;
 	hourOld = hour;

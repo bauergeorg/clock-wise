@@ -19,6 +19,7 @@
 //! Functional prototypes
 void initDcf77(void);
 uint8_t plausibilityCheck(uint8_t hourNew, uint8_t minuteNew, uint8_t hourOld, uint8_t minuteOld);
+void updateDcf77_backupTime(uint8_t *hourOld, uint8_t *minuteOld);
 void decodeDcf77 (void);
 void startDcf77Signal(void);
 void stopDcf77Signal(void);
