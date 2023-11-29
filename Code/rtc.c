@@ -96,6 +96,17 @@ void RTC_Clock_Read(void)
 	hour = hour_ones + hour_tens * 10;
 	
 	I2C_Stop();									/* Stop i2C communication */
+
+	// usart0ReceiveTransmit(0x52); // R
+	// usart0ReceiveTransmit(0x54); // T
+	// usart0ReceiveTransmit(0x43); // C
+
+	// usart0ReceiveTransmit(hour);
+	// usart0ReceiveTransmit(minute);
+	// usart0ReceiveTransmit(second);
+	// usart0ReceiveTransmit(0x0d); // CR
+	// usart0ReceiveTransmit(0x0a); // LF
+
 }
 
 /* function for calendar */
@@ -174,6 +185,17 @@ void RTC_Calendar_Read(void)
 	year = year_ones + year_tens * 10;
 	
 	I2C_Stop();					/* Stop i2C communication */
+
+	// usart0ReceiveTransmit(0x52); // R
+	// usart0ReceiveTransmit(0x54); // T
+	// usart0ReceiveTransmit(0x43); // C
+
+	// usart0ReceiveTransmit(weekday);
+	// usart0ReceiveTransmit(day);
+	// usart0ReceiveTransmit(month);
+	// usart0ReceiveTransmit(year);
+	// usart0ReceiveTransmit(0x0d); // CR
+	// usart0ReceiveTransmit(0x0a); // LF
 }
 
 //! initialize real time clock via i2c 
